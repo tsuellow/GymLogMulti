@@ -443,7 +443,7 @@ public class PayClientActivity extends AppCompatActivity {
         dateTo=calTo.getTime();
 
 
-        final PaymentEntry paymentEntry=new PaymentEntry(clientId,product,amountUsd,dateFrom,dateTo,timestamp,exchangeRate,currency,comment,extra);
+        final PaymentEntry paymentEntry=new PaymentEntry(clientId,product,amountUsd,dateFrom,dateTo,timestamp,exchangeRate,currency,comment,extra,null,MainActivity.GYM_BRANCH);
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {

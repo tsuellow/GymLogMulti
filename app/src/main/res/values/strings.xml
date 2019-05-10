@@ -234,6 +234,7 @@
     <string name="error_serv">The server could not be found. Please try again after some time!!</string>
     <string name="error_parse">Parsing error! Please try again after some time!!</string>
     <string name="error_timeout">Connection TimeOut! Please check your internet connection.</string>
+    <string name="branch">Branch:</string>
 
 
 </resources>

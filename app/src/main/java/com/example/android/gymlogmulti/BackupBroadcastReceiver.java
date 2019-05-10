@@ -35,6 +35,7 @@ public class BackupBroadcastReceiver extends BroadcastReceiver {
 
                         JSONObject jsonObject=dataBackup.createAllJson(clients,payments,visits);
                         dataBackup.syncAllAutomatic(jsonObject,context);
+                        dataBackup.restoreNew();
                 }
             });
 

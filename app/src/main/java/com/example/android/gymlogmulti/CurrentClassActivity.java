@@ -75,7 +75,7 @@ public class CurrentClassActivity extends AppCompatActivity implements CurrentCl
         //Date classTime= DateMethods.getRoundedHour(new Date());
         //final String twoHHAgo=new SimpleDateFormat("h:mm a").format(date);
 
-        final LiveData<List<ClientVisitJoin>> clients = mDb.clientDao().getCurrentClass(date,str);
+        final LiveData<List<ClientVisitJoin>> clients = mDb.clientDao().getCurrentClass(date,str,MainActivity.GYM_BRANCH);
         clients.observe(this, new Observer<List<ClientVisitJoin>>() {
             @Override
             public void onChanged(@Nullable List<ClientVisitJoin> clientEntries) {

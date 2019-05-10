@@ -63,8 +63,9 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity{
 
-    public static final String GYM_ID="zz";
-    public static final String USER_NAME="GenericTestGym";
+    public static final String GYM_ID="mm";
+    public static final String USER_NAME="TestGymMulti";
+    public static final String GYM_BRANCH="UNIQUE";
 
     public static final String CHANNEL_ID="111";
     private Button mManualSearch;
@@ -317,7 +318,7 @@ public class MainActivity extends AppCompatActivity{
                     access="D";
                 }
 
-                final VisitEntry visitEntry= new VisitEntry(mClientData.getId(),new Date(),access);
+                final VisitEntry visitEntry= new VisitEntry(mClientData.getId(),new Date(),access,MainActivity.GYM_BRANCH);
                 AppExecutors.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
@@ -340,7 +341,7 @@ public class MainActivity extends AppCompatActivity{
                             float singlePayment1 = Float.valueOf(singlePaymentStr1);
                             float exchangeRate = Float.valueOf(exchangeRateStr);
                             final PaymentEntry singlePassPay = new PaymentEntry(singleVisitId, getString(R.string.single_day_pass), singlePayment1/exchangeRate,
-                                    new Date(), new Date(), new Date(),exchangeRate,"C$",null,null);
+                                    new Date(), new Date(), new Date(),exchangeRate,"C$",null,null,null,MainActivity.GYM_BRANCH);
                             AppExecutors.getInstance().diskIO().execute(new Runnable() {
                                 @Override
                                 public void run() {
@@ -356,7 +357,7 @@ public class MainActivity extends AppCompatActivity{
                             float singlePayment2=Float.valueOf(singlePaymentStr2);
                             float exchangeRate = Float.valueOf(exchangeRateStr);
                             final PaymentEntry singlePassPay=new PaymentEntry(singleVisitId,getString(R.string.single_day_pass),singlePayment2/exchangeRate,
-                                    new Date(),new Date(),new Date(),exchangeRate,"C$",null,null);
+                                    new Date(),new Date(),new Date(),exchangeRate,"C$",null,null,null,MainActivity.GYM_BRANCH);
                             AppExecutors.getInstance().diskIO().execute(new Runnable() {
                                 @Override
                                 public void run() {

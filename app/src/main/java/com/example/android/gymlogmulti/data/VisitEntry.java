@@ -5,6 +5,9 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
+import com.example.android.gymlogmulti.MainActivity;
 
 import java.util.Date;
 
@@ -16,33 +19,44 @@ import java.util.Date;
 public class VisitEntry {
 
 
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+    @PrimaryKey() @NonNull
+    private String id= MainActivity.GYM_BRANCH+"_"+System.currentTimeMillis()/1000;
     private int clientId;
     private Date timestamp;
     private String access;
     private int syncStatus=0;
+    private String branch;
 
-    public VisitEntry(int clientId, Date timestamp, String access) {
+    public VisitEntry(int clientId, Date timestamp, String access, String branch) {
         this.clientId = clientId;
         this.timestamp = timestamp;
         this.access = access;
+        this.branch = branch;
     }
 
     @Ignore
-    public VisitEntry(int id, int clientId, Date timestamp, String access, int syncStatus) {
+    public VisitEntry(String id, int clientId, Date timestamp, String access, int syncStatus, String branch) {
         this.id = id;
         this.clientId = clientId;
         this.timestamp = timestamp;
         this.access = access;
         this.syncStatus = syncStatus;
+        this.branch = branch;
     }
 
-    public int getId() {
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

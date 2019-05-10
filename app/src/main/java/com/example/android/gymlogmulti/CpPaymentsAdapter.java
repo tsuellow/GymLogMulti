@@ -75,7 +75,7 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull CpPaymentsAdapter.ViewHolder viewHolder, int i) {
         final PaymentEntry payment=mPayments.get(i);
-        final int paymentId=payment.getId();
+        final String paymentId=payment.getId();
 
         //now find the tvs in the viewholder and assign them the correct text
         final String from = new SimpleDateFormat("YYYY-MM-dd").format(payment.getPaidFrom());
@@ -89,6 +89,7 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
 
         final String dialogText=mContext.getString(R.string.payment_id)+" "+payment.getId()+ " \n"+
                 mContext.getString(R.string.paid_at)+" "+DateConverter.getDateString(payment.getTimestamp()).substring(0,16)+ " \n"+
+                mContext.getString(R.string.branch)+" "+payment.getBranch()+ " \n"+
                 mContext.getString(R.string.amount)+" "+amount+" \n"+
                 mContext.getString(R.string.currency_cap)+" "+payment.getCurrency()+" \n"+
                 mContext.getString(R.string.product_cap)+" "+payment.getProduct()+" \n"+

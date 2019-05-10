@@ -190,7 +190,7 @@ public class ClientsSearchActivity extends AppCompatActivity implements ClientsS
                     access="D";
                 }
 
-                final VisitEntry visitEntry= new VisitEntry(mClientData.getId(),new Date(),access);
+                final VisitEntry visitEntry= new VisitEntry(mClientData.getId(),new Date(),access,MainActivity.GYM_BRANCH);
                 AppExecutors.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {

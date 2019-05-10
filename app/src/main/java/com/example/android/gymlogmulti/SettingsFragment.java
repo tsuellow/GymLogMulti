@@ -30,7 +30,7 @@ import java.util.Calendar;
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     EditTextPreference gymName, gymOwner;
-    Preference changePin, changeOwnerPin, backupAll, restoreAll, backupTime, exchangeRate, singlePassMinus1, singlePassMinus2;
+    Preference changePin, changeOwnerPin, backupAll, restoreAll, backupTime, exchangeRate, singlePassMinus1, singlePassMinus2, lastSync;
     ListPreference preferredCurrency;
     TimePickerDialog.OnTimeSetListener onTimeSetListenerBackup;
     GymDatabase mDb;

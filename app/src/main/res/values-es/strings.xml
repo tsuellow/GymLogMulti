@@ -194,4 +194,5 @@
     <string name="error_parse">Error de parsing, intentalo de nuevo en un rato</string>
     <string name="error_serv">No se pudo conectar al servidor, intentalo de nuevo en un rato</string>
     <string name="error_timeout">La conexión caducó, revisá tu conexión a internet e intentalo de nuevo en un rato</string>
+    <string name="branch">Sucursal:</string>
 </resources>

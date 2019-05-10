@@ -39,21 +39,21 @@ public interface ClientDao {
     List<ClientEntry> getClientToBeSynced();
 
     @Query("SELECT C.* FROM (SELECT clientId, MAX(paidUntil) AS paidUntil " +
-            "FROM payment WHERE isValid=1 AND clientId>0 GROUP BY clientId) AS P " +
-            "LEFT JOIN client AS C ON P.clientId=C.id WHERE substr(paidUntil,1,10)=substr(:date,1,10) ORDER BY C.firstName ASC")
-    LiveData<List<ClientEntry>> getPaymentDueClients(Date date);
+            "FROM payment WHERE isValid=1 AND clientId>0 and branch=:branch GROUP BY clientId) AS P " +
+            "LEFT JOIN client AS C ON P.clientId=C.id WHERE substr(paidUntil,1,10)=substr(:date,1,10)  ORDER BY C.firstName ASC")
+    LiveData<List<ClientEntry>> getPaymentDueClients(Date date, String branch);
 
     @Query("SELECT C.id, C.firstName, C.lastName, C.photo, V.timestamp from " +
             "(select * from (SELECT clientId, max(timestamp) AS timestamp FROM " +
-            "visit WHERE access='G' AND timestamp>:queryDate AND clientId>0 GROUP BY clientId) " +
+            "visit WHERE access='G' AND timestamp>:queryDate AND clientId>0 AND branch=:branch GROUP BY clientId) " +
             "UNION " +
-            "SELECT clientId, timestamp FROM visit where timestamp>:queryDate AND clientId IN(-1,-2)) AS V " +
+            "SELECT clientId, timestamp FROM visit where timestamp>:queryDate AND clientId IN(-1,-2) AND branch=:branch) AS V " +
             "LEFT JOIN client AS C ON V.clientId=C.id " +
             "WHERE C.firstName LIKE :namePart " +
             "OR C.lastName LIKE :namePart " +
             "OR CAST(C.id as TEXT) LIKE :namePart " +
             "ORDER BY timestamp DESC")
-    LiveData<List<ClientVisitJoin>> getCurrentClass(Date queryDate, String namePart);
+    LiveData<List<ClientVisitJoin>> getCurrentClass(Date queryDate, String namePart, String branch);
 
     @Query("UPDATE client SET syncStatus=1 WHERE syncStatus!=1")
     void bulkUpdateClientSyncStatus();

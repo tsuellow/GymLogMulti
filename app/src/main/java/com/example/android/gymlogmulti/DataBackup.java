@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -77,7 +78,7 @@ public class DataBackup {
 
 
 //    public String SERVER_URL="http://"+HOST_ADDRESS.trim()+"/gymlog/";
-    public String SERVER_URL="https://www.id-ex.de/GymLog/php/";
+    public String SERVER_URL="https://www.id-ex.de/GymLogMulti/php/";
 
 
     private int COUNTER_SYNCED_CLIENT;
@@ -167,6 +168,7 @@ public class DataBackup {
                                         }
                                     });
                                 }
+                                restoreNew();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                                 Log.d("belloy"," wtf");
@@ -334,6 +336,8 @@ public class DataBackup {
                 paymentObject.put("currency", payment.getCurrency());
                 paymentObject.put("comment", payment.getComment());
                 paymentObject.put("extra", payment.getExtra());
+                paymentObject.put("branch",payment.getBranch());
+                paymentObject.put("dayofweek",payment.getDayOfWeek());
                 paymentDataArray.put(paymentObject);
             }catch (JSONException e){
                 e.printStackTrace();
@@ -350,6 +354,7 @@ public class DataBackup {
                 visitObject.put("clientid", visit.getClientId());
                 visitObject.put("timestamp", null2String(DateConverter.getDateString(visit.getTimestamp())));
                 visitObject.put("access", null2String(visit.getAccess()));
+                visitObject.put("branch",visit.getBranch());
                 visitDataArray.put(visitObject);
             }catch (JSONException e){
                 e.printStackTrace();
@@ -393,6 +398,22 @@ public class DataBackup {
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(1, mBuilder.build());
+    }
+
+    public static void showNotificationRestoreNew(Context context,String title, String text) {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context,MainActivity.CHANNEL_ID)
+                        .setSmallIcon(R.drawable.notify_icon)
+                        .setContentTitle(title)
+                        .setContentText(text)
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(text));
+
+        mBuilder.setDefaults(Notification.DEFAULT_SOUND);
+        mBuilder.setAutoCancel(true);
+        NotificationManager mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(2, mBuilder.build());
     }
 
     public void restoreAll(){
@@ -446,6 +467,78 @@ public class DataBackup {
                         error.printStackTrace();
                         Log.d("belloy"," error");
                         showRestoreDialog(mContext.getString(R.string.data_restore_failed),mContext.getString(R.string.failed_response_w_errors));
+
+                    }
+                });
+        MySingleton.getInstance(mContext).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public void restoreNew(){
+        JSONObject restoreJson=new JSONObject();
+        long lastSync;
+        try{
+            lastSync=sharedPreferences.getLong("lastsync",0);
+        }catch (Exception e){
+            lastSync=0;
+        }
+
+        try {
+            restoreJson.put("gym_id", MainActivity.GYM_ID);
+            restoreJson.put("lastSync",lastSync);
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest;
+
+        jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, SERVER_URL + "restore_new.php", restoreJson, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String res = response.getString("response");
+                            if (res.equals("OK")) {
+                                GymDatabase mDb=GymDatabase.getInstance(mContext);
+                                JSONArray jsonClientArray=response.getJSONArray("client");
+                                JSONArray jsonPaymentArray=response.getJSONArray("payment");
+                                JSONArray jsonVisitArray=response.getJSONArray("visit");
+                                int totalClient=jsonClientArray.length();
+                                int totalPayment=jsonPaymentArray.length();
+                                int totalVisit=jsonVisitArray.length();
+                                int countClient=replaceOrInsertClient(jsonClientArray,mDb);
+                                int countPayment=replaceOrInsertPayment(jsonPaymentArray,mDb);
+                                int countVisit=replaceOrInsertVisit(jsonVisitArray,mDb);
+
+                                long lastSync_new=response.getLong("lastSync");
+                                SharedPreferences.Editor editor=sharedPreferences.edit();
+                                editor.putLong("lastsync",lastSync_new);
+                                editor.commit();
+
+                                Toast.makeText(mContext,sharedPreferences.getLong("lastsync",11)+"yeihhh",Toast.LENGTH_LONG).show();
+
+                                String countMessage=""+countClient+"/"+totalClient+" "+ DataBackup.this.mContext.getString(R.string.clients)+ " \n"+
+                                        countPayment+"/"+totalPayment+" "+ DataBackup.this.mContext.getString(R.string.payments)+ " \n"+
+                                        countVisit+"/"+totalVisit+" "+ DataBackup.this.mContext.getString(R.string.visits)+ " \n"+
+                                        "records successfully retrieved from the server";
+
+                                showNotificationRestoreNew(mContext,"Restore Successful",countMessage);
+                            }else{
+//                                showRestoreDialog(mContext.getString(R.string.data_restore_failed),mContext.getString(R.string.failed_no_connection));
+                            }
+                            //notification
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.d("belloy","malformed JSON response");
+                            //showRestoreDialog(mContext.getString(R.string.data_restore_failed),mContext.getString(R.string.failed_malformed_json));
+                        }
+
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                        Log.d("belloy"," error");
+                        //showRestoreDialog(mContext.getString(R.string.data_restore_failed),mContext.getString(R.string.failed_response_w_errors));
 
                     }
                 });
@@ -510,7 +603,7 @@ public class DataBackup {
         for(int i=0;i<jsonArray.length();i++){
             try {
                 JSONObject json = jsonArray.getJSONObject(i);
-                int id = json.getInt("id");
+                String id = json.getString("id");
                 int clientId = json.getInt("clientId");
                 String product = json.getString("product");
                 Double amountUsd = json.getDouble("amountUsd");
@@ -522,10 +615,12 @@ public class DataBackup {
                 String paidUntil = json.getString("paidUntil");
                 String timestamp = json.getString("timestamp");
                 int isValid = json.getInt("isValid");
+                String branch=json.getString("branch");
+                String dayOfWeek=json.getString("dayOfWeek");
                 try{
                 final PaymentEntry paymentEntry=new PaymentEntry(id,clientId,product,amountUsd.floatValue(),DateConverter.String2Date(paidFrom),
                         DateConverter.String2Date(paidUntil), DateConverter.String2Date(timestamp),isValid,1,
-                        exchangeRate.floatValue(),currency,comment,extra);
+                        exchangeRate.floatValue(),currency,comment,extra,dayOfWeek,branch);
                     AppExecutors.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -549,12 +644,13 @@ public class DataBackup {
         for(int i=0;i<jsonArray.length();i++){
             try {
                 JSONObject json = jsonArray.getJSONObject(i);
-                int id = json.getInt("id");
+                String id = json.getString("id");
                 int clientId = json.getInt("clientId");
                 String timestamp = json.getString("timestamp");
                 String access = json.getString("access");
+                String branch = json.getString("branch");
                 try{
-                    final VisitEntry visitEntry=new VisitEntry(id,clientId,DateConverter.String2Date(timestamp),access,1);
+                    final VisitEntry visitEntry=new VisitEntry(id,clientId,DateConverter.String2Date(timestamp),access,1,null);
                     AppExecutors.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {

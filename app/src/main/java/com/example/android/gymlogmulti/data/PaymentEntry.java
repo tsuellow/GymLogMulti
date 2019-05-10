@@ -5,6 +5,9 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
+import com.example.android.gymlogmulti.MainActivity;
 
 import java.util.Date;
 
@@ -16,8 +19,8 @@ import java.util.Date;
         onDelete = ForeignKey.NO_ACTION),
         indices = {@Index(value = {"clientId"})})
 public class PaymentEntry {
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+    @PrimaryKey() @NonNull
+    private String id= MainActivity.GYM_BRANCH+"_"+System.currentTimeMillis()/1000;
     private int clientId;
     private String product;
     private float amountUsd;
@@ -30,8 +33,10 @@ public class PaymentEntry {
     private String currency;
     private String comment;
     private String extra;
+    private String dayOfWeek;
+    private String branch;
 
-    public PaymentEntry(int clientId, String product, float amountUsd, Date paidFrom, Date paidUntil, Date timestamp, float exchangeRate, String currency, String comment, String extra) {
+    public PaymentEntry(int clientId, String product, float amountUsd, Date paidFrom, Date paidUntil, Date timestamp, float exchangeRate, String currency, String comment, String extra, String dayOfWeek, String branch) {
         this.clientId = clientId;
         this.product = product;
         this.amountUsd = amountUsd;
@@ -42,10 +47,12 @@ public class PaymentEntry {
         this.currency = currency;
         this.comment = comment;
         this.extra = extra;
+        this.dayOfWeek= dayOfWeek;
+        this.branch = branch;
     }
 
     @Ignore
-    public PaymentEntry(int id, int clientId, String product, float amountUsd, Date paidFrom, Date paidUntil, Date timestamp, int isValid, int syncStatus, float exchangeRate, String currency, String comment, String extra) {
+    public PaymentEntry(String id, int clientId, String product, float amountUsd, Date paidFrom, Date paidUntil, Date timestamp, int isValid, int syncStatus, float exchangeRate, String currency, String comment, String extra, String dayOfWeek, String branch) {
         this.id = id;
         this.clientId = clientId;
         this.product = product;
@@ -59,13 +66,31 @@ public class PaymentEntry {
         this.currency = currency;
         this.comment = comment;
         this.extra = extra;
+        this.dayOfWeek= dayOfWeek;
+        this.branch = branch;
     }
 
-    public int getId() {
+    public String getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public void setDayOfWeek(String dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
+    }
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

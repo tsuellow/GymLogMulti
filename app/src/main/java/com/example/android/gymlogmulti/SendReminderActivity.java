@@ -90,7 +90,7 @@ public class SendReminderActivity extends AppCompatActivity implements SendRemin
     }
 
     private void populateDataSource(Date date) {
-        final LiveData<List<ClientEntry>> clients = mDb.clientDao().getPaymentDueClients(date);
+        final LiveData<List<ClientEntry>> clients = mDb.clientDao().getPaymentDueClients(date, MainActivity.GYM_BRANCH);
         clients.observe(this, new Observer<List<ClientEntry>>() {
             @Override
             public void onChanged(@Nullable List<ClientEntry> clientEntries) {

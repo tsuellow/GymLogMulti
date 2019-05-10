@@ -10,7 +10,7 @@ import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.util.Log;
 
-@Database(entities = {ClientEntry.class, PaymentEntry.class, VisitEntry.class},version = 8,exportSchema = false)
+@Database(entities = {ClientEntry.class, PaymentEntry.class, VisitEntry.class},version = 10,exportSchema = false)
 @TypeConverters(DateConverter.class)
 public abstract class GymDatabase extends RoomDatabase {
 
@@ -37,6 +37,33 @@ public abstract class GymDatabase extends RoomDatabase {
         }
     };
 
+    static final Migration MIGRATION_8_9 = new Migration(8, 9) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE payment " +
+                    "ADD COLUMN dayOfWeek TEXT ");
+            database.execSQL("ALTER TABLE payment " +
+                    "ADD COLUMN branch TEXT DEFAULT 'UNIQUE'");
+            database.execSQL("ALTER TABLE visit " +
+                    "ADD COLUMN branch TEXT DEFAULT 'UNIQUE'");
+        }
+    };
+
+//    static final Migration MIGRATION_9_10 = new Migration(9, 10) {
+//        @Override
+//        public void migrate(SupportSQLiteDatabase database) {
+//            database.execSQL("PRAGMA foreign_keys=off;");
+//            database.execSQL("BEGIN TRANSACTION;");
+//            database.execSQL("ALTER TABLE visit RENAME TO _visit_old;");
+//            database.execSQL("ALTER TABLE payment RENAME TO _payment_old;");
+//            database.execSQL("CREATE TABLE visit" +
+//                    "( id TEXT PRIMARY KEY," +
+//                    "  last_name VARCHAR NOT NULL," +
+//                    "  first_name VARCHAR," +
+//                    "  hire_date DATE);");
+//        }
+//    };
+
     public static GymDatabase getInstance(Context context) {
         if (sInstance == null) {
             synchronized (LOCK) {
@@ -44,8 +71,9 @@ public abstract class GymDatabase extends RoomDatabase {
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
                         GymDatabase.class, GymDatabase.DB_NAME)
                         //.allowMainThreadQueries()
-                        //.fallbackToDestructiveMigration()
-                        .addMigrations(MIGRATION_7_8)
+                        .fallbackToDestructiveMigration()
+//                        .addMigrations(MIGRATION_7_8)
+//                        .addMigrations(MIGRATION_8_9)
                         .build();
             }
         }
