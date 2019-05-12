@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
+import android.widget.Toast;
 
 import com.example.android.gymlogmulti.data.ClientEntry;
 import com.example.android.gymlogmulti.data.GymDatabase;
@@ -34,11 +35,10 @@ public class BackupBroadcastReceiver extends BroadcastReceiver {
                         final List<VisitEntry> visits=mDb.visitDao().getVisitToBeSynced();
 
                         JSONObject jsonObject=dataBackup.createAllJson(clients,payments,visits);
-                        dataBackup.syncAllAutomatic(jsonObject,context);
-                        dataBackup.restoreNew();
+                        dataBackup.syncAllAutomatic(jsonObject,context,false);
+                        dataBackup.restoreNew(false);
                 }
             });
-
         }else{
             DataBackup.showNotification(context,context.getString(R.string.gymlog_backup_failed),context.getString(R.string.no_internet_at_planned_time));
         }

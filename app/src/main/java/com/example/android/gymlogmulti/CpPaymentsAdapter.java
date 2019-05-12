@@ -95,6 +95,9 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
                 mContext.getString(R.string.product_cap)+" "+payment.getProduct()+" \n"+
                 mContext.getString(R.string.from_cap)+" "+DateConverter.getDateString(payment.getPaidFrom()).substring(0,16)+ " \n"+
                 mContext.getString(R.string.to_cap)+" "+DateConverter.getDateString(payment.getPaidUntil()).substring(0,16)+ " \n"+
+                mContext.getString(R.string.days_of_week)+" "+payment.getDayOfWeek().replace("1",mContext.getString(R.string.sun))
+                    .replace("2",mContext.getString(R.string.mon)).replace("3",mContext.getString(R.string.tue)).replace("4",mContext.getString(R.string.wed))
+                    .replace("5",mContext.getString(R.string.thu)).replace("6",mContext.getString(R.string.fri)).replace("7",mContext.getString(R.string.sat))+ " \n"+
                 mContext.getString(R.string.comment_cap)+" "+payment.getComment();
 
 

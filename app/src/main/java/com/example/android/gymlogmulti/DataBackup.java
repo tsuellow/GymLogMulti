@@ -10,8 +10,14 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -80,6 +86,10 @@ public class DataBackup {
 //    public String SERVER_URL="http://"+HOST_ADDRESS.trim()+"/gymlog/";
     public String SERVER_URL="https://www.id-ex.de/GymLogMulti/php/";
 
+    private String titleBackup;
+    private String messageBackup;
+    private String titleRestore;
+    private String messageRestore;
 
     private int COUNTER_SYNCED_CLIENT;
     private int SYNC_CLIENT_VOLUME;
@@ -90,19 +100,22 @@ public class DataBackup {
     private int COUNTER_SYNCED_VISIT;
     private int SYNC_VISIT_VOLUME;
 
+    CountDownLatch requestCountDown;
+
     //backup entire client synclist
-    public void backupTables(List<ClientEntry> clients, List<PaymentEntry> payments, List<VisitEntry>  visits){
+    public void syncData(List<ClientEntry> clients, List<PaymentEntry> payments, List<VisitEntry>  visits){
         COUNTER_SYNCED_CLIENT =0;
         SYNC_CLIENT_VOLUME=clients.size();
         COUNTER_SYNCED_PAYMENT =0;
         SYNC_PAYMENT_VOLUME=payments.size();
         COUNTER_SYNCED_VISIT =0;
         SYNC_VISIT_VOLUME=visits.size();
-        CountDownLatch requestCountDown = new CountDownLatch(1);
+        requestCountDown = new CountDownLatch(2);
 
         JSONObject backupJson= createAllJson(clients,payments,visits);
 
-        syncAll(backupJson,mContext,requestCountDown);
+        syncAllAutomatic(backupJson,mContext,true);
+        restoreNew(true);
 
         new Thread(new ThreadToBeHeld(requestCountDown)).start();
     }
@@ -116,17 +129,15 @@ public class DataBackup {
         }
         public void run() {
             try {
-                //requestCountDown.countDown();
+
                 requestCountDown.await();
 
             }catch(InterruptedException ex){}
             mainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-//                    Toast.makeText(getApplicationContext(),"clients "+COUNTER_SYNCED_CLIENT+
-//                            "payments "+COUNTER_SYNCED_PAYMENT+"" +
-//                            "visits "+COUNTER_SYNCED_VISIT,Toast.LENGTH_LONG).show();
-                    showPositiveDialog();
+
+                    displaySyncDialog();
                 }
             });
         }
@@ -168,7 +179,6 @@ public class DataBackup {
                                         }
                                     });
                                 }
-                                restoreNew();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                                 Log.d("belloy"," wtf");
@@ -187,7 +197,7 @@ public class DataBackup {
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void syncAllAutomatic(final JSONObject backupJson, final Context context){
+    public void syncAllAutomatic(final JSONObject backupJson, final Context context, final boolean isManual){
 
         JsonObjectRequest jsonObjectRequest;
 
@@ -200,6 +210,12 @@ public class DataBackup {
                             COUNTER_SYNCED_CLIENT=response.getInt("counter_client");
                             COUNTER_SYNCED_PAYMENT=response.getInt("counter_payment");
                             COUNTER_SYNCED_VISIT=response.getInt("counter_visit");
+                            JSONArray jsonClientArray=backupJson.getJSONArray("clientData");
+                            JSONArray jsonPaymentArray=backupJson.getJSONArray("paymentData");
+                            JSONArray jsonVisitArray=backupJson.getJSONArray("visitData");
+                            int totalClient=jsonClientArray.length();
+                            int totalPayment=jsonPaymentArray.length();
+                            int totalVisit=jsonVisitArray.length();
                             Log.d("belloy","works");
                             if (res.equals("OK")) {
                                 //update sqlite db
@@ -211,42 +227,52 @@ public class DataBackup {
                                         GymDatabase.getInstance(context).visitDao().bulkUpdateVisitSyncStatus();
                                     }
                                 });
-                                String notificationText=""+COUNTER_SYNCED_CLIENT+" "+mContext.getString(R.string.clients)+ " \n"+
-                                        COUNTER_SYNCED_PAYMENT+" "+mContext.getString(R.string.payments)+ " \n"+
-                                        COUNTER_SYNCED_VISIT+" "+mContext.getString(R.string.visits)+ " \n"+
+                                messageBackup=""+COUNTER_SYNCED_CLIENT+"/"+totalClient+" "+mContext.getString(R.string.clients)+ " \n"+
+                                        COUNTER_SYNCED_PAYMENT+"/"+totalPayment+" "+mContext.getString(R.string.payments)+ " \n"+
+                                        COUNTER_SYNCED_VISIT+"/"+totalVisit+" "+mContext.getString(R.string.visits)+ " \n"+
                                         mContext.getString(R.string.were_synced);
-                                showNotification(context,context.getString(R.string.gymlog_backup_successful),notificationText);
+                                titleBackup=context.getString(R.string.gymlog_backup_successful);
                             }else{
-                                showNotification(context,context.getString(R.string.gymlog_backup_failed),context.getString(R.string.failed_no_connection));
+                                titleBackup=context.getString(R.string.gymlog_backup_failed);
+                                messageBackup=context.getString(R.string.failed_no_connection);
                             }
                             //notification
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Log.d("belloy","malformed JSON response");
-                            showNotification(context,context.getString(R.string.gymlog_backup_failed),context.getString(R.string.failed_malformed_json));
-                        }
+                            titleBackup=context.getString(R.string.gymlog_backup_failed);
+                            messageBackup=context.getString(R.string.failed_malformed_json);
 
+                        }
+                        if (isManual){
+                            new Thread(new CountdownExecuted(requestCountDown)).start();
+                        }else {
+                            showNotification(context, titleBackup, messageBackup);
+                        }
 
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
-                        String message = null;
                         if (error instanceof NetworkError) {
-                            message = context.getString(R.string.error_con_1);
+                            messageBackup = context.getString(R.string.error_con_1);
                         } else if (error instanceof ServerError) {
-                            message = context.getString(R.string.error_serv);
+                            messageBackup = context.getString(R.string.error_serv);
                         } else if (error instanceof AuthFailureError) {
-                            message = context.getString(R.string.error_con_1);
+                            messageBackup = context.getString(R.string.error_con_1);
                         } else if (error instanceof ParseError) {
-                            message = context.getString(R.string.error_parse);
+                            messageBackup = context.getString(R.string.error_parse);
                         } else if (error instanceof NoConnectionError) {
-                            message = context.getString(R.string.error_con_1);
+                            messageBackup = context.getString(R.string.error_con_1);
                         } else if (error instanceof TimeoutError) {
-                            message = context.getString(R.string.error_timeout);
+                            messageBackup = context.getString(R.string.error_timeout);
                         }
-                        showNotification(context,context.getString(R.string.gymlog_backup_failed),message);
+                        titleBackup=context.getString(R.string.gymlog_backup_failed);
+                        if (isManual){
+                            new Thread(new CountdownExecuted(requestCountDown)).start();
+                        }else {
+                            showNotification(context, titleBackup, messageBackup);
+                        }
 
                     }
                 });
@@ -260,6 +286,35 @@ public class DataBackup {
             textField="";
         }
         return textField;
+    }
+
+    private void displaySyncDialog(){
+        AlertDialog.Builder mBuilder=new AlertDialog.Builder(mContext);
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View mView=inflater.inflate(R.layout.dialog_sync_data,null);
+        TextView mBackupTitle=(TextView) mView.findViewById(R.id.tv_backup_title);
+        mBackupTitle.setText(titleBackup);
+        TextView mBackupMessage=(TextView) mView.findViewById(R.id.tv_backup_message);
+        mBackupMessage.setText(messageBackup);
+
+        TextView mRestoreTitle=(TextView) mView.findViewById(R.id.tv_restore_title);
+        mRestoreTitle.setText(titleRestore);
+        TextView mRestoreMessage=(TextView) mView.findViewById(R.id.tv_restore_message);
+        mRestoreMessage.setText(messageRestore);
+
+        Button mClose=(Button) mView.findViewById(R.id.btn_close);
+        mBuilder.setTitle(R.string.data_sync_finished);
+        mBuilder.setView(mView);
+
+        final AlertDialog dialog=mBuilder.create();
+
+        mClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     private void showPositiveDialog(){
@@ -291,7 +346,7 @@ public class DataBackup {
         alertDialog.show();
     }
 
-
+// create json to sync
     public JSONObject createAllJson(List<ClientEntry> clients, List<PaymentEntry> payments, List<VisitEntry>  visits){
 
         JSONObject backupJson=new JSONObject();
@@ -473,7 +528,7 @@ public class DataBackup {
         MySingleton.getInstance(mContext).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void restoreNew(){
+    public void restoreNew(final boolean isManual){
         JSONObject restoreJson=new JSONObject();
         long lastSync;
         try{
@@ -511,24 +566,28 @@ public class DataBackup {
                                 long lastSync_new=response.getLong("lastSync");
                                 SharedPreferences.Editor editor=sharedPreferences.edit();
                                 editor.putLong("lastsync",lastSync_new);
-                                editor.commit();
+                                editor.apply();
 
-                                Toast.makeText(mContext,sharedPreferences.getLong("lastsync",11)+"yeihhh",Toast.LENGTH_LONG).show();
-
-                                String countMessage=""+countClient+"/"+totalClient+" "+ DataBackup.this.mContext.getString(R.string.clients)+ " \n"+
+                                messageRestore=""+countClient+"/"+totalClient+" "+ DataBackup.this.mContext.getString(R.string.clients)+ " \n"+
                                         countPayment+"/"+totalPayment+" "+ DataBackup.this.mContext.getString(R.string.payments)+ " \n"+
                                         countVisit+"/"+totalVisit+" "+ DataBackup.this.mContext.getString(R.string.visits)+ " \n"+
-                                        "records successfully retrieved from the server";
+                                        mContext.getString(R.string.restore_msg);
 
-                                showNotificationRestoreNew(mContext,"Restore Successful",countMessage);
+                                titleRestore=mContext.getString(R.string.restore_success);
                             }else{
-//                                showRestoreDialog(mContext.getString(R.string.data_restore_failed),mContext.getString(R.string.failed_no_connection));
+                                titleRestore=mContext.getString(R.string.restore_failed);
+                                messageRestore=mContext.getString(R.string.failed_no_connection);
                             }
                             //notification
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Log.d("belloy","malformed JSON response");
-                            //showRestoreDialog(mContext.getString(R.string.data_restore_failed),mContext.getString(R.string.failed_malformed_json));
+                            titleRestore=mContext.getString(R.string.restore_failed);
+                            messageRestore=mContext.getString(R.string.failed_malformed_json);
+                        }
+                        if (isManual){
+                            new Thread(new CountdownExecuted(requestCountDown)).start();
+                        }else {
+                            showNotificationRestoreNew(mContext, titleRestore, messageRestore);
                         }
 
 
@@ -537,8 +596,26 @@ public class DataBackup {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
-                        Log.d("belloy"," error");
-                        //showRestoreDialog(mContext.getString(R.string.data_restore_failed),mContext.getString(R.string.failed_response_w_errors));
+
+                        if (error instanceof NetworkError) {
+                            messageRestore = mContext.getString(R.string.error_con_1);
+                        } else if (error instanceof ServerError) {
+                            messageRestore = mContext.getString(R.string.error_serv);
+                        } else if (error instanceof AuthFailureError) {
+                            messageRestore = mContext.getString(R.string.error_con_1);
+                        } else if (error instanceof ParseError) {
+                            messageRestore = mContext.getString(R.string.error_parse);
+                        } else if (error instanceof NoConnectionError) {
+                            messageRestore = mContext.getString(R.string.error_con_1);
+                        } else if (error instanceof TimeoutError) {
+                            messageRestore = mContext.getString(R.string.error_timeout);
+                        }
+                        titleRestore=mContext.getString(R.string.restore_failed);
+                        if (isManual){
+                            new Thread(new CountdownExecuted(requestCountDown)).start();
+                        }else {
+                            showNotificationRestoreNew(mContext, titleRestore, messageRestore);
+                        }
 
                     }
                 });

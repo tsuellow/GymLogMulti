@@ -56,6 +56,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -275,7 +276,10 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-        final LiveData<PaymentEntry> currentPayment = mDb.paymentDao().getCurrentPaymentByClient(clientId,new Date());
+        Calendar cal=Calendar.getInstance();
+        cal.setTime(new Date());
+        String dayOfWeek="%"+cal.get(Calendar.DAY_OF_WEEK)+"%";
+        final LiveData<PaymentEntry> currentPayment = mDb.paymentDao().getCurrentPaymentByClient(clientId,new Date(),dayOfWeek);
         currentPayment.observe(this, new Observer<PaymentEntry>() {
             @Override
             public void onChanged(@Nullable PaymentEntry paymentEntry) {

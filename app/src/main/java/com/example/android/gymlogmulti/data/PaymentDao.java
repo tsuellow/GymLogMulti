@@ -20,8 +20,8 @@ public interface PaymentDao {
 
     @Query("SELECT * FROM payment WHERE clientId=:clientId AND substr(paidFrom,1,10)<=substr(:date,1,10) AND substr(paidUntil,1,10)>=substr(:date,1,10) " +
             "AND ((SUBSTR(paidFrom,12,5)<=SUBSTR(:date,12,5) AND SUBSTR(paidUntil,12,5)>=SUBSTR(:date,12,5)) OR SUBSTR(paidUntil,12,5)='00:00')"+
-            "AND isValid=1 ORDER BY paidUntil DESC LIMIT 1")
-    LiveData<PaymentEntry> getCurrentPaymentByClient(int clientId, Date date);
+            "AND isValid=1 AND dayOfWeek LIKE :dayOfWeek ORDER BY paidUntil DESC LIMIT 1")
+    LiveData<PaymentEntry> getCurrentPaymentByClient(int clientId, Date date, String dayOfWeek);
 
     @Query("SELECT * FROM payment WHERE clientId=:clientId AND isValid=1 ORDER BY paidUntil DESC")
     LiveData<List<PaymentEntry>> getPaymentsByClient(int clientId);

@@ -195,4 +195,16 @@
     <string name="error_serv">No se pudo conectar al servidor, intentalo de nuevo en un rato</string>
     <string name="error_timeout">La conexión caducó, revisá tu conexión a internet e intentalo de nuevo en un rato</string>
     <string name="branch">Sucursal:</string>
+    <string name="data_sync_finished">Sincronización finalizada</string>
+    <string name="days_of_week">Días</string>
+    <string name="fri">vie</string>
+    <string name="mon">lun</string>
+    <string name="restore_failed">Actualización fallida</string>
+    <string name="restore_msg">fueron recibidos exitosamente del servidor</string>
+    <string name="restore_success">Actualización exitosa</string>
+    <string name="sat">sab</string>
+    <string name="sun">dom</string>
+    <string name="thu">jue</string>
+    <string name="tue">mar</string>
+    <string name="wed">mie</string>
 </resources>

@@ -157,25 +157,15 @@ public class SearchActivity extends AppCompatActivity {
                     AppExecutors.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
-                            if (dataBackup.hasHostAccess()){
                                 final List<ClientEntry> clients=mDb.clientDao().getClientToBeSynced();
                                 final List<PaymentEntry> payments=mDb.paymentDao().getPaymentToBeSynced();
                                 final List<VisitEntry> visits=mDb.visitDao().getVisitToBeSynced();
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        dataBackup.backupTables(clients,payments,visits);
-
+                                        dataBackup.syncData(clients,payments,visits);
                                     }
                                 });
-                            }else{
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        dataBackup.showNegativeDialog();
-                                    }
-                                });
-                            }
                         }
                     });
 

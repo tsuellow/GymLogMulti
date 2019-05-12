@@ -35,6 +35,7 @@ import com.example.android.gymlogmulti.data.VisitEntry;
 import com.example.android.gymlogmulti.utils.DateMethods;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -157,8 +158,10 @@ public class ClientsSearchActivity extends AppCompatActivity implements ClientsS
                 taskCompleted();
             }
         });
-
-        final LiveData<PaymentEntry> currentPayment = mDb.paymentDao().getCurrentPaymentByClient(clientId,new Date());
+        Calendar cal=Calendar.getInstance();
+        cal.setTime(new Date());
+        String dayOfWeek="%"+cal.get(Calendar.DAY_OF_WEEK)+"%";
+        final LiveData<PaymentEntry> currentPayment = mDb.paymentDao().getCurrentPaymentByClient(clientId,new Date(),dayOfWeek);
         currentPayment.observe(this, new Observer<PaymentEntry>() {
             @Override
             public void onChanged(@Nullable PaymentEntry paymentEntry) {

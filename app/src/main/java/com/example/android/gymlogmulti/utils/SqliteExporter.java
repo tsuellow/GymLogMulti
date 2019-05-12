@@ -138,10 +138,11 @@ public class SqliteExporter {
         Cursor curCSV = null;
         try {
             csvWrite = new CSVWriter(new FileWriter(backupFile));
-            curCSV = db.rawQuery("SELECT p.id [ID de pago], clientId [ID de cliente], firstName [Nombre], lastName [Apellido], product [Producto]," +
-                    "amountUsd [Precio en USD], amountUsd*exchangeRate [Precio en C$], exchangeRate [Taza de Cambio C$/USD], currency [Moneda], " +
+            curCSV = db.rawQuery("SELECT p.id [ID de pago], clientId [ID de cliente], firstName [Nombre], lastName [Apellido], product [Producto], " +
+                    "branch [Sucursal], amountUsd [Precio en USD], amountUsd*exchangeRate [Precio en C$], exchangeRate [Tasa de Cambio C$/USD], currency [Moneda], " +
                     "substr(paidFrom,1,10) [Desde], substr(paidUntil,1,10) [Hasta], " +
-                    "substr(paidFrom,12,5) [Desde hora], substr(paidUntil,12,5) [Hasta hora], comment [Comentario], " +
+                    "substr(paidFrom,12,5) [Desde hora], substr(paidUntil,12,5) [Hasta hora], " +
+                    "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(dayOfWeek,'1','dom'),'2','lun'),'3','mar'),'4','mie'),'5','jue'),'6','vie'),'7','sab')  [Dias], comment [Comentario], " +
                     "timestamp [Fecha de pago], isValid [Validez del pago], extra [Informacion adicional] " +
                     "FROM payment p left join client c on p.clientId=c.id",null);
             csvWrite.writeNext(curCSV.getColumnNames());
@@ -176,7 +177,7 @@ public class SqliteExporter {
         try {
             csvWrite = new CSVWriter(new FileWriter(backupFile));
             curCSV = db.rawQuery("SELECT v.id [ID de visita], clientId [ID de cliente], firstName [Nombre], " +
-                    "lastName [Apellido], timestamp [Fecha de la visita], access [Codigo de acceso], " +
+                    "lastName [Apellido], timestamp [Fecha de la visita], branch [Sucursal], access [Codigo de acceso], " +
                     "case when access='G' then 'autorizado' else 'denegado' end as [Acceso] " +
                     "FROM visit v left join client c on v.clientId=c.id",null);
             csvWrite.writeNext(curCSV.getColumnNames());

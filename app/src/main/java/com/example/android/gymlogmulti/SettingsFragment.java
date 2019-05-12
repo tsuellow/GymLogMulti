@@ -297,11 +297,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             //setting the repeating alarm that will be fired every day
             am.cancel(pi);
             am.setRepeating(AlarmManager.RTC_WAKEUP, timeInMillis, AlarmManager.INTERVAL_HOUR, pi);
+            Toast.makeText(getContext(), R.string.backup_time_toast, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        Toast.makeText(getContext(), R.string.backup_time_toast, Toast.LENGTH_SHORT).show();
+
     }
 
 

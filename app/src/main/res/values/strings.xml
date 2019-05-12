@@ -235,6 +235,18 @@
     <string name="error_parse">Parsing error! Please try again after some time!!</string>
     <string name="error_timeout">Connection TimeOut! Please check your internet connection.</string>
     <string name="branch">Branch:</string>
+    <string name="restore_success">Restore successful</string>
+    <string name="restore_failed">Restore failed</string>
+    <string name="restore_msg">records successfully retrieved from the server</string>
+    <string name="data_sync_finished">Data synchronization finished</string>
+    <string name="mon">mon</string>
+    <string name="tue">tue</string>
+    <string name="wed">wed</string>
+    <string name="thu">thu</string>
+    <string name="fri">fri</string>
+    <string name="sat">sat</string>
+    <string name="sun">sun</string>
+    <string name="days_of_week">Days of week:</string>
 
 
 </resources>

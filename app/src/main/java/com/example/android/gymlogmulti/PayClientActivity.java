@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -52,13 +53,14 @@ public class PayClientActivity extends AppCompatActivity {
     DatePickerDialog.OnDateSetListener onDateSetListenerFrom, onDateSetListenerTo;
     TextView mName, mDateLastPaid, mAltAmount, mExchangeRate;
     EditText mFrom, mTo, mAmount, mToTime, mFromTime, mComment;
+    CheckBox mMon, mTue, mWed, mThu, mFri, mSat, mSun;
     AutoCompleteTextView mProduct, mCurrency;
     TextInputLayout loFrom, loTo, loProduct, loAmount, loFromTime, loToTime;
     Button mSubmit;
     ExpandableLinearLayout mExpandable;
     LinearLayout mAdvancedOptions;
     ImageView mArrow;
-    String extra;
+    String extra, daysOfWeek;
 
     Date dateFrom, dateTo, dateLastPaidUntil;
     int clientId, hourFrom, minuteFrom, hourTo, minuteTo;
@@ -223,6 +225,14 @@ public class PayClientActivity extends AppCompatActivity {
         };
         mAmount.addTextChangedListener(textWatcher);
         mCurrency.addTextChangedListener(textWatcher);
+
+        mMon=(CheckBox) findViewById(R.id.cb_mon);
+        mTue=(CheckBox) findViewById(R.id.cb_tue);
+        mWed=(CheckBox) findViewById(R.id.cb_wed);
+        mThu=(CheckBox) findViewById(R.id.cb_thu);
+        mFri=(CheckBox) findViewById(R.id.cb_fri);
+        mSat=(CheckBox) findViewById(R.id.cb_sat);
+        mSun=(CheckBox) findViewById(R.id.cb_sun);
 
 
         mSubmit=(Button) findViewById(R.id.bt_submit_pay);
@@ -442,8 +452,16 @@ public class PayClientActivity extends AppCompatActivity {
         calTo.set(Calendar.MINUTE, minuteTo);
         dateTo=calTo.getTime();
 
+        daysOfWeek="";
+        daysOfWeek = mSun.isChecked() ? daysOfWeek+Calendar.SUNDAY+", " : daysOfWeek;
+        daysOfWeek = mMon.isChecked() ? daysOfWeek+Calendar.MONDAY+", " : daysOfWeek;
+        daysOfWeek = mTue.isChecked() ? daysOfWeek+Calendar.TUESDAY+", " : daysOfWeek;
+        daysOfWeek = mWed.isChecked() ? daysOfWeek+Calendar.WEDNESDAY+", " : daysOfWeek;
+        daysOfWeek = mThu.isChecked() ? daysOfWeek+Calendar.THURSDAY+", " : daysOfWeek;
+        daysOfWeek = mFri.isChecked() ? daysOfWeek+Calendar.FRIDAY+", " : daysOfWeek;
+        daysOfWeek = mSat.isChecked() ? daysOfWeek+Calendar.SATURDAY+", " : daysOfWeek;
 
-        final PaymentEntry paymentEntry=new PaymentEntry(clientId,product,amountUsd,dateFrom,dateTo,timestamp,exchangeRate,currency,comment,extra,null,MainActivity.GYM_BRANCH);
+        final PaymentEntry paymentEntry=new PaymentEntry(clientId,product,amountUsd,dateFrom,dateTo,timestamp,exchangeRate,currency,comment,extra,daysOfWeek,MainActivity.GYM_BRANCH);
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
