@@ -47,6 +47,7 @@ import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.data.PaymentEntry;
 import com.example.android.gymlogmulti.data.VisitEntry;
 import com.example.android.gymlogmulti.utils.DateMethods;
+import com.example.android.gymlogmulti.utils.PhotoUtils;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.ResultPoint;
 import com.journeyapps.barcodescanner.BarcodeCallback;
@@ -502,19 +503,20 @@ public class MainActivity extends AppCompatActivity{
 
     //function to show image
     private void setPic(ImageView imageView, int clientId) {
-        String imageFileName = "MEDIUM_" + clientId;
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File medium = new File(storageDir, imageFileName + ".jpg");
-        if (medium.exists()) {
-            String clientMedium = medium.getAbsolutePath();
-            Bitmap medBit = BitmapFactory.decodeFile(clientMedium);
-            //Bitmap bitScaled = Bitmap.createScaledBitmap(medBit, 180, 180, false);
-            RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(getResources(), medBit);
-            roundedBitmapDrawable.setCircular(true);
-            imageView.setImageDrawable(roundedBitmapDrawable);
-        } else {
-            imageView.setImageResource(R.drawable.camera);
-        }
+        PhotoUtils.getAppropriateBitmapRounded(clientId,mContext,imageView);
+//        String imageFileName = "MEDIUM_" + clientId;
+//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        File medium = new File(storageDir, imageFileName + ".jpg");
+//        if (medium.exists()) {
+//            String clientMedium = medium.getAbsolutePath();
+//            Bitmap medBit = BitmapFactory.decodeFile(clientMedium);
+//            //Bitmap bitScaled = Bitmap.createScaledBitmap(medBit, 180, 180, false);
+//            RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(getResources(), medBit);
+//            roundedBitmapDrawable.setCircular(true);
+//            imageView.setImageDrawable(roundedBitmapDrawable);
+//        } else {
+//            imageView.setImageResource(R.drawable.camera);
+//        }
     }
 
     private void resetAlarm(){

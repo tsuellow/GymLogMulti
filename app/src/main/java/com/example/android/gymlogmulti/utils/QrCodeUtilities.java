@@ -5,14 +5,20 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.os.Environment;
 import android.util.Log;
 
+import com.example.android.gymlogmulti.MainActivity;
 import com.example.android.gymlogmulti.R;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,6 +106,36 @@ public class QrCodeUtilities {
         canvas.drawBitmap(overlay, centreX, centreY, null);
 
         return combined;
+    }
+
+    public static void saveQrCode(int clientId, File qrFile, Context context){
+        try {
+
+            String qrText="{\"obj\":\"l\",\""+ MainActivity.GYM_ID+"id\":"+clientId+"}";
+
+            if (qrFile.exists()){
+                qrFile.delete();
+            }
+            FileOutputStream qrOut = new FileOutputStream(qrFile);
+
+            Bitmap qrCode= QrCodeUtilities.GenerateQrCode(context,qrText);
+            qrCode.compress(Bitmap.CompressFormat.JPEG, 100, qrOut);
+            qrOut.flush();
+            qrOut.close();
+            Log.d("QR saved", "QR ok");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            Log.d("QR saved", "QR IOException");
+        }
+    }
+
+    public static File createQrCodeFile(int clientId, Context context)  {
+        // Create an image file name
+        String imageFileName = "QR_CODE_" + clientId ;
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File qrCode = new File(storageDir, imageFileName + ".jpg");
+        // Save a file: path for use with ACTION_VIEW intents
+        return qrCode;
     }
 
 

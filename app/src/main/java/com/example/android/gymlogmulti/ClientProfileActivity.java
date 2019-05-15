@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.gymlogmulti.data.ClientEntry;
 import com.example.android.gymlogmulti.data.GymDatabase;
@@ -31,6 +32,7 @@ import com.example.android.gymlogmulti.data.VisitEntry;
 import com.example.android.gymlogmulti.utils.DateMethods;
 import com.example.android.gymlogmulti.utils.PhoneUtilities;
 import com.example.android.gymlogmulti.utils.PhotoUtils;
+import com.example.android.gymlogmulti.utils.QrCodeUtilities;
 
 import java.io.File;
 import java.util.Date;
@@ -117,19 +119,45 @@ public class ClientProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (phoneNr!=null){
-                    openWhatsAppContact(phoneNr,firstName);
+                        openWhatsAppContact(phoneNr, firstName);
                     //openWhatsApp2("00505"+phoneNr);
+                }else{
+                    Toast.makeText(mContext,R.string.need_phone,Toast.LENGTH_LONG).show();
                 }
 
             }
         });
 
+        final File qrFile= QrCodeUtilities.createQrCodeFile(clientId,mContext);
+        if (!qrFile.exists()) {
+            mQrCode.setColorFilter(getResources().getColor(android.R.color.tab_indicator_text));
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    QrCodeUtilities.saveQrCode(clientId,qrFile,mContext);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mQrCode.setColorFilter(getResources().getColor(R.color.colorAccent));
+                        }
+                    });
+
+                }
+            });
+        }
+
+
+
         mQrCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (phoneNr!=null){
-                    shareQrOnWhatsApp(phoneNr);
-                    //openWhatsApp2("00505"+phoneNr);
+                if (qrFile.exists()) {
+                    if (phoneNr != null) {
+                        shareQrOnWhatsApp(phoneNr);
+                        //openWhatsApp2("00505"+phoneNr);
+                    } else {
+                        Toast.makeText(mContext, R.string.need_phone, Toast.LENGTH_LONG).show();
+                    }
                 }
 
             }

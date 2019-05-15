@@ -247,6 +247,7 @@
     <string name="sat">sat</string>
     <string name="sun">sun</string>
     <string name="days_of_week">Days of week:</string>
+    <string name="need_phone">You need to provide a phone number for this to work</string>
 
 
 </resources>

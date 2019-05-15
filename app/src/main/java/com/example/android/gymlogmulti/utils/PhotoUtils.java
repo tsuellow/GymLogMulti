@@ -95,10 +95,12 @@ public class PhotoUtils {
 
     public static void createGrayScaleThumb(int clientId, String base64, Context context){
 
-        String thumbFileName = "THUMB_" + clientId;
+        String mediumFileName = "MEDIUM_" + clientId ;
+        String thumbFileName = "THUMB_" + clientId ;
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File medium = new File(storageDir, mediumFileName + ".jpg");
         File thumb = new File(storageDir, thumbFileName + ".jpg");
-        if (!thumb.exists()) {
+        if (!medium.exists()) {
             try {
                 FileOutputStream thumbOut = new FileOutputStream(thumb);
                 byte[] biteOutput = Base64.decode(base64, 0);

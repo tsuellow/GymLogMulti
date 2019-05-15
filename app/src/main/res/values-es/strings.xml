@@ -207,4 +207,5 @@
     <string name="thu">jue</string>
     <string name="tue">mar</string>
     <string name="wed">mie</string>
+    <string name="need_phone">Tenés que proporcionar un numero telefónico para que esto funcione</string>
 </resources>
