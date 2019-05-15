@@ -110,12 +110,15 @@ public class DataBackup {
         SYNC_PAYMENT_VOLUME=payments.size();
         COUNTER_SYNCED_VISIT =0;
         SYNC_VISIT_VOLUME=visits.size();
-        requestCountDown = new CountDownLatch(2);
+        int latchCount= MainActivity.IS_MULTI ? 2 : 1;
+        requestCountDown = new CountDownLatch(latchCount);
 
         JSONObject backupJson= createAllJson(clients,payments,visits);
 
         syncAllAutomatic(backupJson,mContext,true);
-        restoreNew(true);
+        if (MainActivity.IS_MULTI) {
+            restoreNew(true);
+        }
 
         new Thread(new ThreadToBeHeld(requestCountDown)).start();
     }
@@ -154,48 +157,6 @@ public class DataBackup {
 
 
     //sync to server
-    private void syncAll(final JSONObject backupJson, final Context context, final CountDownLatch countDownLatch){
-
-        JsonObjectRequest jsonObjectRequest;
-
-            jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.POST, SERVER_URL + "backup_all.php", backupJson, new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                String res = response.getString("response");
-                                COUNTER_SYNCED_CLIENT=response.getInt("counter_client");
-                                COUNTER_SYNCED_PAYMENT=response.getInt("counter_payment");
-                                COUNTER_SYNCED_VISIT=response.getInt("counter_visit");
-                                Log.d("belloy","works");
-                                if (res.equals("OK")) {
-                                    //update sqlite db
-                                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            GymDatabase.getInstance(context).clientDao().bulkUpdateClientSyncStatus();
-                                            GymDatabase.getInstance(context).paymentDao().bulkUpdatePaymentSyncStatus();
-                                            GymDatabase.getInstance(context).visitDao().bulkUpdateVisitSyncStatus();
-                                        }
-                                    });
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Log.d("belloy"," wtf");
-                            }
-                            new Thread(new CountdownExecuted(countDownLatch)).start();
-
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            error.printStackTrace();
-                            Log.d("belloy"," error");
-                            new Thread(new CountdownExecuted(countDownLatch)).start();
-                        }
-                    });
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
-    }
 
     public void syncAllAutomatic(final JSONObject backupJson, final Context context, final boolean isManual){
 
@@ -317,34 +278,6 @@ public class DataBackup {
         dialog.show();
     }
 
-    private void showPositiveDialog(){
-        final AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
-        alertDialog.setTitle(mContext.getString(R.string.backup_finished));
-        alertDialog.setMessage(""+COUNTER_SYNCED_CLIENT+"/"+SYNC_CLIENT_VOLUME+" "+mContext.getString(R.string.clients)+ " \n"+
-                COUNTER_SYNCED_PAYMENT+"/"+SYNC_PAYMENT_VOLUME+" "+mContext.getString(R.string.payments)+ " \n"+
-                COUNTER_SYNCED_VISIT+"/"+SYNC_VISIT_VOLUME+" "+mContext.getString(R.string.visits)+ " \n"+
-                mContext.getString(R.string.were_synced));
-
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.ok), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                alertDialog.dismiss();
-            }
-        });
-        alertDialog.show();
-    }
-
-    public void showNegativeDialog(){
-        final AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
-        alertDialog.setTitle(mContext.getString(R.string.backup_failed));
-        alertDialog.setMessage(mContext.getString(R.string.backup_failed_explained));
-
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.ok), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                alertDialog.dismiss();
-            }
-        });
-        alertDialog.show();
-    }
 
 // create json to sync
     public JSONObject createAllJson(List<ClientEntry> clients, List<PaymentEntry> payments, List<VisitEntry>  visits){
@@ -417,17 +350,16 @@ public class DataBackup {
         }
 
         try {
-            String gymName=sharedPreferences.getString("gymname","MyGym");
-            String gymOwner=sharedPreferences.getString("gymowner","Fulano de Tal");
             String pin=sharedPreferences.getString("changeownerpin","1234");
+            long pinDate=sharedPreferences.getLong("pindate", 0);
 
             backupJson.put("gym_id", MainActivity.GYM_ID);
             backupJson.put("backup_date", DateConverter.getDateString(new Date()));
             backupJson.put("user", MainActivity.USER_NAME);
+            backupJson.put("gym_name", MainActivity.COMPANY_NAME);
+            backupJson.put("gym_owner", MainActivity.COMPANY_OWNER);
             backupJson.put("pin", pin);
-            backupJson.put("gym_name", gymName);
-            backupJson.put("gym_owner", gymOwner);
-
+            backupJson.put("pin_date", pinDate);
             backupJson.put("clientData", clientDataArray);
             backupJson.put("paymentData", paymentDataArray);
             backupJson.put("visitData", visitDataArray);
@@ -562,9 +494,18 @@ public class DataBackup {
                                 int countClient=replaceOrInsertClient(jsonClientArray,mDb);
                                 int countPayment=replaceOrInsertPayment(jsonPaymentArray,mDb);
                                 int countVisit=replaceOrInsertVisit(jsonVisitArray,mDb);
-
+                                //set new last sync flag for future restore actions
                                 long lastSync_new=response.getLong("lastSync");
                                 SharedPreferences.Editor editor=sharedPreferences.edit();
+                                //see if we need to renew our current local pin
+                                long pinDate=sharedPreferences.getLong("pindate", 0);
+                                JSONObject jsonAdmin=response.getJSONObject("adminData");
+                                long serverPinDate=jsonAdmin.getLong("pin_date");
+                                if(serverPinDate>pinDate){
+                                    editor.putString("changeownerpin",jsonAdmin.getString("pin"));
+                                    editor.putLong("pindate",serverPinDate);
+                                }
+
                                 editor.putLong("lastsync",lastSync_new);
                                 editor.apply();
 

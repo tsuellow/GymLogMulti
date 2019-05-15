@@ -75,7 +75,7 @@ public class CpVisitsAdapter extends RecyclerView.Adapter<CpVisitsAdapter.ViewHo
         Drawable drawable = res.getDrawable(R.drawable.bullet_circle);
 
         //now find the tvs in the viewholder and assign them the correct text
-        String date = new SimpleDateFormat("YYYY-MM-dd").format(visit.getTimestamp());
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(visit.getTimestamp());
         String time = new SimpleDateFormat("HH:mm:ss").format(visit.getTimestamp());
         viewHolder.mDate.setText(date);
         viewHolder.mTime.setText(time);

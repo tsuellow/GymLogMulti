@@ -35,12 +35,12 @@ public class SqliteExporter {
     public static final String DB_BACKUP_TABLE_NAME = "table";
 
     public String export(SQLiteDatabase db) throws IOException{
-        if( !FileUtils.isExternalStorageWritable() ){
+        if( !CsvFileUtils.isExternalStorageWritable() ){
             Log.d(TAG, "cant write");
             throw new IOException("Cannot write to external storage");
         }
         String dirName = createExportDirName();
-        File backupDir = FileUtils.createDirIfNotExist(FileUtils.getAppDir(mContext) + dirName);
+        File backupDir = CsvFileUtils.createDirIfNotExist(CsvFileUtils.getAppDir(mContext) + dirName);
 
         File exportClientFile = new File(backupDir, "client.csv");
         File exportPaymentFile = new File(backupDir, "payment.csv");

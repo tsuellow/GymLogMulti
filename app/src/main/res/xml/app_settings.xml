@@ -31,10 +31,9 @@
             android:key="gymname"
             android:title="@string/gym_name"/>
 
-        <EditTextPreference
-            android:defaultValue="@string/fulano"
-            android:key="gymowner"
-            android:title="@string/gym_owner"/>
+        <Preference
+            android:key="gymdata"
+            android:title="Gym Data"/>
 
     </PreferenceCategory>
 
@@ -53,8 +52,7 @@
 
         <Preference
             android:title="@string/backup_time"
-            android:key="timebackup"
-            android:defaultValue="00:00"/>
+            android:key="timebackup"/>
 
 
     </PreferenceCategory>

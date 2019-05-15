@@ -2,9 +2,11 @@ package com.example.android.gymlogmulti;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
@@ -40,6 +42,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.android.gymlogmulti.data.ClientEntry;
+import com.example.android.gymlogmulti.data.DateConverter;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.data.PaymentEntry;
 import com.example.android.gymlogmulti.data.VisitEntry;
@@ -60,6 +63,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity{
@@ -67,6 +71,10 @@ public class MainActivity extends AppCompatActivity{
     public static final String GYM_ID="mm";
     public static final String USER_NAME="TestGymMulti";
     public static final String GYM_BRANCH="UNIQUE";
+    public static final String COMPANY_NAME="My Gym Empire";
+    public static final String COMPANY_OWNER="Fulano de Tal";
+    public static final boolean IS_MULTI=true;
+
 
     public static final String CHANNEL_ID="111";
     private Button mManualSearch;
@@ -171,6 +179,7 @@ public class MainActivity extends AppCompatActivity{
         });
 
         createNotificationChannel();
+        resetAlarm();
     }
 
     //flashlight method
@@ -505,6 +514,45 @@ public class MainActivity extends AppCompatActivity{
             imageView.setImageDrawable(roundedBitmapDrawable);
         } else {
             imageView.setImageResource(R.drawable.camera);
+        }
+    }
+
+    private void resetAlarm(){
+        long autoBackupTime;
+        try{
+            autoBackupTime=sharedPreferences.getLong("timebackup",0);
+        }catch (Exception e){
+            autoBackupTime=0;
+        }
+        Date now =DateMethods.getRoundDate(new Date());
+        if(now.getTime()>autoBackupTime){
+            Random r = new Random();
+            long nextBackupTime=now.getTime()+ r.nextInt(3600000);
+            SharedPreferences.Editor editor=sharedPreferences.edit();
+            editor.putLong("timebackup",nextBackupTime);
+            editor.apply();
+            setBackupTime(nextBackupTime);
+        }
+    }
+
+    private void setBackupTime(long timeInMillis) {
+
+        try {
+            //getting the alarm manager
+            AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+            //creating a new intent specifying the broadcast receiver
+            Intent i = new Intent(getApplicationContext(), BackupBroadcastReceiver.class);
+
+            //creating a pending intent using the intent
+            PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            //setting the repeating alarm that will be fired every day
+            am.cancel(pi);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, timeInMillis, AlarmManager.INTERVAL_HOUR, pi);
+            Toast.makeText(getApplicationContext(), R.string.backup_time_toast, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

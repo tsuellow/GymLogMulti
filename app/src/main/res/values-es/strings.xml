@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GymLog</string>
+    <string name="app_name">GymLogMulti</string>
     <string name="err_last_name">Ingresá tu apellido</string>
     <string name="err_phone">Ingresá un teléfono válido</string>
     <string name="welcome">Pasá adelante</string>
@@ -30,7 +30,7 @@
     <string name="enter_pin">Ingresá el PIN</string>
     <string name="backup_in_process">Respaldo en proceso, por favor tené paciencia!</string>
     <string name="no_internet">No se pudo conectar al internet</string>
-    <string name="backup">Respaldar datos</string>
+    <string name="backup">Sincronizar</string>
     <string name="search">Buscar</string>
     <string name="pay">Pagar</string>
     <string name="backup_finished">Respaldo de datos finalizado!</string>
@@ -38,7 +38,7 @@
     <string name="visits">visitas</string>
     <string name="were_synced">sincronizadas al servidor de manera exitosa</string>
     <string name="ok">OK</string>
-    <string name="backup_failed">Respaldo de datos falló!</string>
+    <string name="backup_failed">Respaldo fallido!</string>
     <string name="backup_failed_explained">No se pudo establecer una conección con el servidor. Intentálo de nuevo y, si el problema persiste, chequeá que este dispositivo este conectado al Wifi o contactá al proveedor.</string>
     <string name="invalid_entry">Entrada inválida</string>
     <string name="input_required">Entrada requerida</string>
@@ -199,7 +199,7 @@
     <string name="days_of_week">Días</string>
     <string name="fri">vie</string>
     <string name="mon">lun</string>
-    <string name="restore_failed">Actualización fallida</string>
+    <string name="restore_failed">Actualización fallida!</string>
     <string name="restore_msg">fueron recibidos exitosamente del servidor</string>
     <string name="restore_success">Actualización exitosa</string>
     <string name="sat">sab</string>

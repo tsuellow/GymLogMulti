@@ -236,7 +236,7 @@
     <string name="error_timeout">Connection TimeOut! Please check your internet connection.</string>
     <string name="branch">Branch:</string>
     <string name="restore_success">Restore successful</string>
-    <string name="restore_failed">Restore failed</string>
+    <string name="restore_failed">Restore failed!</string>
     <string name="restore_msg">records successfully retrieved from the server</string>
     <string name="data_sync_finished">Data synchronization finished</string>
     <string name="mon">mon</string>

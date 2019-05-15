@@ -78,8 +78,8 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
         final String paymentId=payment.getId();
 
         //now find the tvs in the viewholder and assign them the correct text
-        final String from = new SimpleDateFormat("YYYY-MM-dd").format(payment.getPaidFrom());
-        final String until = new SimpleDateFormat("YYYY-MM-dd").format(payment.getPaidUntil());
+        final String from = new SimpleDateFormat("yyyy-MM-dd").format(payment.getPaidFrom());
+        final String until = new SimpleDateFormat("yyyy-MM-dd").format(payment.getPaidUntil());
         viewHolder.mFrom.setText(from);
         viewHolder.mUntil.setText(until);
         viewHolder.mProduct.setText(payment.getProduct());

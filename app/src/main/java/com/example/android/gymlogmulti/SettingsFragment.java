@@ -15,6 +15,7 @@ import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 //import android.support.v7.preference.PreferenceFragmentCompat;
+import com.example.android.gymlogmulti.data.DateConverter;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
@@ -26,11 +27,12 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.Date;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    EditTextPreference gymName, gymOwner;
-    Preference changePin, changeOwnerPin, backupAll, restoreAll, backupTime, exchangeRate, singlePassMinus1, singlePassMinus2, lastSync;
+    EditTextPreference gymName;
+    Preference changePin, changeOwnerPin, backupAll, restoreAll, backupTime, exchangeRate, singlePassMinus1, singlePassMinus2, gymData;
     ListPreference preferredCurrency;
     TimePickerDialog.OnTimeSetListener onTimeSetListenerBackup;
     GymDatabase mDb;
@@ -46,19 +48,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         mDb=GymDatabase.getInstance(getContext());
 
         gymName = (EditTextPreference) findPreference("gymname");
-        gymOwner = (EditTextPreference) findPreference("gymowner");
+        gymData = (Preference) findPreference("gymdata");
 
 
         //alternative solution
         backupTime =(Preference) findPreference("timebackup");
 
-        backupTime.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                displayTimePickerDialog(getString(R.string.backup_time));
-                return false;
-            }
-        });
 
         exchangeRate = (Preference) findPreference("usd2cs");
         exchangeRate.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -156,6 +151,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                         SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(getContext());
                         SharedPreferences.Editor editor=sharedPreferences.edit();
                         editor.putString(key,newPin1);
+                        Date now= new Date();
+                        if (key.contentEquals("changeownerpin")){
+                            editor.putLong("pindate",now.getTime());
+                        }
                         editor.apply();
                         dialog.dismiss();
                         Toast.makeText(getContext(), R.string.pin_change_success,Toast.LENGTH_SHORT).show();
@@ -282,111 +281,112 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         dialog.show();
     }
 
-    private void setBackupTime(long timeInMillis) {
-
-        try {
-            //getting the alarm manager
-            AlarmManager am = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-
-            //creating a new intent specifying the broadcast receiver
-            Intent i = new Intent(getContext(), BackupBroadcastReceiver.class);
-
-            //creating a pending intent using the intent
-            PendingIntent pi = PendingIntent.getBroadcast(getContext(), 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
-
-            //setting the repeating alarm that will be fired every day
-            am.cancel(pi);
-            am.setRepeating(AlarmManager.RTC_WAKEUP, timeInMillis, AlarmManager.INTERVAL_HOUR, pi);
-            Toast.makeText(getContext(), R.string.backup_time_toast, Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-    }
+//    private void setBackupTime(long timeInMillis) {
+//
+//        try {
+//            //getting the alarm manager
+//            AlarmManager am = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+//
+//            //creating a new intent specifying the broadcast receiver
+//            Intent i = new Intent(getContext(), BackupBroadcastReceiver.class);
+//
+//            //creating a pending intent using the intent
+//            PendingIntent pi = PendingIntent.getBroadcast(getContext(), 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+//
+//            //setting the repeating alarm that will be fired every day
+//            am.cancel(pi);
+//            am.setRepeating(AlarmManager.RTC_WAKEUP, timeInMillis, AlarmManager.INTERVAL_HOUR, pi);
+//            Toast.makeText(getContext(), R.string.backup_time_toast, Toast.LENGTH_SHORT).show();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
-    private void displayTimePickerDialog(String title){
-        AlertDialog.Builder mBuilder=new AlertDialog.Builder(getContext());
-        View mView=getLayoutInflater().inflate(R.layout.dialog_time_picker,null);
-        final TimePicker mTimePicker=(TimePicker) mView.findViewById(R.id.tp_time_picker);
-        mTimePicker.setIs24HourView(false);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mTimePicker.setHour(12);
-            mTimePicker.setMinute(0);
-        } else {
-            mTimePicker.setCurrentHour(12);
-            mTimePicker.setCurrentMinute(0);
-        }
-
-        Button mOk=(Button) mView.findViewById(R.id.btn_ok_tp);
-        Button mCancel=(Button) mView.findViewById(R.id.btn_cancel_tp);
-        mBuilder.setTitle(title);
-        mBuilder.setView(mView);
-
-        final AlertDialog dialog=mBuilder.create();
-
-        //button to dismiss dialog
-        mOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int newHour, newMinute;
-                if (Build.VERSION.SDK_INT >= 23 ){
-                    newHour = mTimePicker.getHour();
-                    newMinute = mTimePicker.getMinute();
-                }
-                else{
-                    newHour = mTimePicker.getCurrentHour();
-                    newMinute = mTimePicker.getCurrentMinute();
-                }
-                String timePicked = "";
-                String sHour = "00";
-                if(newHour < 10){
-                    sHour = "0"+newHour;
-                } else {
-                    sHour = String.valueOf(newHour);
-                }
-                String sMinute = "00";
-                if(newMinute < 10){
-                    sMinute = "0"+newMinute;
-                } else {
-                    sMinute = String.valueOf(newMinute);
-                }
-                timePicked=""+sHour+":"+sMinute;
-                String textTimePicked=getString(R.string.each_full_hour)+" "+sMinute+" "+getString(R.string.minutes);
-                SharedPreferences.Editor editor=sharedPreferences.edit();
-                editor.putString("timebackup",timePicked);
-                editor.apply();
-                backupTime.setSummary(textTimePicked);
-                //now trigger backup
-                Calendar cal=Calendar.getInstance();
-                int year=cal.get(Calendar.YEAR);
-                int month=cal.get(Calendar.MONTH);
-                int day=cal.get(Calendar.DAY_OF_MONTH);
-                cal.set(year,month,day,newHour,newMinute,0);
-                long timeInMillis=cal.getTimeInMillis();
-                setBackupTime(timeInMillis);
-                dialog.dismiss();
-            }
-        });
-
-        mCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
-    }
+//    private void displayTimePickerDialog(String title){
+//        AlertDialog.Builder mBuilder=new AlertDialog.Builder(getContext());
+//        View mView=getLayoutInflater().inflate(R.layout.dialog_time_picker,null);
+//        final TimePicker mTimePicker=(TimePicker) mView.findViewById(R.id.tp_time_picker);
+//        mTimePicker.setIs24HourView(false);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            mTimePicker.setHour(12);
+//            mTimePicker.setMinute(0);
+//        } else {
+//            mTimePicker.setCurrentHour(12);
+//            mTimePicker.setCurrentMinute(0);
+//        }
+//
+//        Button mOk=(Button) mView.findViewById(R.id.btn_ok_tp);
+//        Button mCancel=(Button) mView.findViewById(R.id.btn_cancel_tp);
+//        mBuilder.setTitle(title);
+//        mBuilder.setView(mView);
+//
+//        final AlertDialog dialog=mBuilder.create();
+//
+//        //button to dismiss dialog
+//        mOk.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                int newHour, newMinute;
+//                if (Build.VERSION.SDK_INT >= 23 ){
+//                    newHour = mTimePicker.getHour();
+//                    newMinute = mTimePicker.getMinute();
+//                }
+//                else{
+//                    newHour = mTimePicker.getCurrentHour();
+//                    newMinute = mTimePicker.getCurrentMinute();
+//                }
+//                String timePicked = "";
+//                String sHour = "00";
+//                if(newHour < 10){
+//                    sHour = "0"+newHour;
+//                } else {
+//                    sHour = String.valueOf(newHour);
+//                }
+//                String sMinute = "00";
+//                if(newMinute < 10){
+//                    sMinute = "0"+newMinute;
+//                } else {
+//                    sMinute = String.valueOf(newMinute);
+//                }
+//                timePicked=""+sHour+":"+sMinute;
+//                String textTimePicked=getString(R.string.each_full_hour)+" "+sMinute+" "+getString(R.string.minutes);
+//                SharedPreferences.Editor editor=sharedPreferences.edit();
+//                editor.putString("timebackup",timePicked);
+//                editor.apply();
+//                backupTime.setSummary(textTimePicked);
+//                //now trigger backup
+//                Calendar cal=Calendar.getInstance();
+//                int year=cal.get(Calendar.YEAR);
+//                int month=cal.get(Calendar.MONTH);
+//                int day=cal.get(Calendar.DAY_OF_MONTH);
+//                cal.set(year,month,day,newHour,newMinute,0);
+//                long timeInMillis=cal.getTimeInMillis();
+//                setBackupTime(timeInMillis);
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        mCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                dialog.dismiss();
+//            }
+//        });
+//        dialog.show();
+//    }
 
 
     private void setPrefSummary(){
         gymName.setSummary(gymName.getText());
-        gymOwner.setSummary(gymOwner.getText());
+        String gymDataText="Company name:"+" "+MainActivity.COMPANY_NAME+ " \n"+
+                "Company owner:"+" "+MainActivity.COMPANY_OWNER+ " \n"+
+                "Branch:"+" "+MainActivity.GYM_BRANCH;
+        gymData.setSummary(gymDataText);
         exchangeRate.setSummary("C$ "+sharedPreferences.getString("usd2cs","1"));
         singlePassMinus1.setSummary("C$ "+sharedPreferences.getString("passminus1","0"));
         singlePassMinus2.setSummary("C$ "+sharedPreferences.getString("passminus2","0"));
-        backupTime.setSummary(getString(R.string.each_full_hour)+" "+sharedPreferences.getString("timebackup","00:00").substring(3)+" "+getString(R.string.minutes));
+        backupTime.setSummary(getString(R.string.each_full_hour)+" "+ DateConverter.getDateString(new Date(sharedPreferences.getLong("timebackup",0))).substring(14,16)+" "+getString(R.string.minutes));
         //languagePref.setSummary(languagePref.getEntry());
     }
 

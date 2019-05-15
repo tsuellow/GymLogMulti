@@ -7,7 +7,7 @@ import com.example.android.gymlogmulti.R;
 
 import java.io.File;
 
-public class FileUtils {
+public class CsvFileUtils {
 
     public static String getAppDir(Context context){
         return context.getExternalFilesDir(null) + "/" + context.getString(R.string.app_name);

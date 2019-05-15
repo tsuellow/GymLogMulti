@@ -14,13 +14,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.Menu;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.example.android.gymlogmulti.data.ClientVisitJoin;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.utils.DateMethods;
 
+
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -130,22 +136,47 @@ public class CurrentClassActivity extends AppCompatActivity implements CurrentCl
 
     @Override
     public void onItemClickListener(int clientId) {
-
-
         showImage(clientId);
-
-
     }
 
+//    private void showImage(int clientId) {
+//        String imageFileName = "MEDIUM_" + clientId ;
+//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        File medium = new File(storageDir, imageFileName + ".jpg");
+//        String clientMedium=medium.getAbsolutePath();
+//        ImageView image = new ImageView(this);
+//        if (medium.exists()) {
+//            Bitmap bitmap = BitmapFactory.decodeFile(clientMedium);
+//            image.setImageBitmap(bitmap);
+//        }else{
+//            image.setImageResource(android.R.drawable.ic_menu_camera);
+//        }
+//
+//        AlertDialog.Builder builder =
+//                new AlertDialog.Builder(this).
+//                        setView(image);
+//        AlertDialog alertDialog=builder.create();
+//        alertDialog.show();
+//        alertDialog.getWindow().setLayout(600, 600);
+//    }
+
     private void showImage(int clientId) {
-        String imageFileName = "MEDIUM_" + clientId ;
+        String imageFileName = "THUMB_" + clientId ;
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File medium = new File(storageDir, imageFileName + ".jpg");
         String clientMedium=medium.getAbsolutePath();
         ImageView image = new ImageView(this);
         if (medium.exists()) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Bitmap bitmap = BitmapFactory.decodeFile(clientMedium);
-            image.setImageBitmap(bitmap);
+            bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
+            byte[] b = baos.toByteArray();
+            String encodedString = Base64.encodeToString(b, 0);
+
+            byte[] biteOutput=Base64.decode(encodedString,0);
+            Bitmap bitmapDeco = BitmapFactory.decodeByteArray(biteOutput, 0, biteOutput.length);
+
+            image.setImageBitmap(Bitmap.createScaledBitmap(bitmapDeco, 600, 600, true));
         }else{
             image.setImageResource(android.R.drawable.ic_menu_camera);
         }
