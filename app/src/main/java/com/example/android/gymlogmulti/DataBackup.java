@@ -609,7 +609,7 @@ public class DataBackup {
                 }catch (Exception e){
                     Log.d("gymlog_failed_restore","inserting client "+id+" failed. please investigate");
                 }
-                if (!photo.isEmpty()||photo!=null) {
+                if (!photo.contentEquals("") || !photo.isEmpty()) {
                     PhotoUtils.createGrayScaleThumb(id, photo, mContext);
                 }
 
