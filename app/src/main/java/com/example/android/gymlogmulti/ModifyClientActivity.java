@@ -45,6 +45,7 @@ import com.example.android.gymlogmulti.data.ClientEntry;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.utils.DateMethods;
 import com.example.android.gymlogmulti.utils.PhoneUtilities;
+import com.example.android.gymlogmulti.utils.PhotoUtils;
 import com.example.android.gymlogmulti.utils.QrCodeUtilities;
 
 import java.io.File;
@@ -76,6 +77,8 @@ public class ModifyClientActivity extends AppCompatActivity {
     int currentSyncStatus;
 
     int clientId;
+
+    String mBase64;
 
 
     private GymDatabase mDb;
@@ -285,10 +288,10 @@ public class ModifyClientActivity extends AppCompatActivity {
         String lastName=mLastName.getText().toString();
         String phone=mPhone.getText().toString();
         String occupation=mOccupation.getText().toString();
-        String photoDir=createImageFile().getAbsolutePath();
+        //String photoDir=createImageFile().getAbsolutePath();
         Date date=new Date();
 
-        final ClientEntry client=new ClientEntry(clientId,firstName,lastName,dateOfBirth,gender,occupation,phone, photoDir, null, date);
+        final ClientEntry client=new ClientEntry(clientId,firstName,lastName,dateOfBirth,gender,occupation,phone, mBase64, null, date);
         if (currentSyncStatus==1){
             client.setSyncStatus(2);
         }
@@ -383,16 +386,17 @@ public class ModifyClientActivity extends AppCompatActivity {
         }
     }
     private void setPicture(){
-        File medium=createMediumFile();
-        String clientMedium=medium.getAbsolutePath();
-        if (medium.exists()) {
-            Bitmap bitmap = BitmapFactory.decodeFile(clientMedium);
-            RoundedBitmapDrawable roundedBitmapDrawable=RoundedBitmapDrawableFactory.create(getResources(),bitmap);
-            roundedBitmapDrawable.setCircular(true);
-            mPhoto.setImageDrawable(roundedBitmapDrawable);
-        }else{
-            mPhoto.setImageResource(R.drawable.camera);
-        }
+        PhotoUtils.getAppropriateBitmapRounded(clientId,this,mPhoto);
+//        File medium=createMediumFile();
+//        String clientMedium=medium.getAbsolutePath();
+//        if (medium.exists()) {
+//            Bitmap bitmap = BitmapFactory.decodeFile(clientMedium);
+//            RoundedBitmapDrawable roundedBitmapDrawable=RoundedBitmapDrawableFactory.create(getResources(),bitmap);
+//            roundedBitmapDrawable.setCircular(true);
+//            mPhoto.setImageDrawable(roundedBitmapDrawable);
+//        }else{
+//            mPhoto.setImageResource(R.drawable.camera);
+//        }
 
     }
 
@@ -438,10 +442,7 @@ public class ModifyClientActivity extends AppCompatActivity {
                     mFemaleRb.setChecked(true);
                 }
                 //set pick
-//                mCurrentPhotoPath=clientEntry.getPhoto();
-//                if (mCurrentPhotoPath!=null) {
-//                    setPic();
-//                }
+                mBase64=clientEntry.getPhoto();
                 setPicture();
 
                 currentSyncStatus=clientEntry.getSyncStatus();
@@ -474,6 +475,9 @@ public class ModifyClientActivity extends AppCompatActivity {
             Bitmap medium = Bitmap.createScaledBitmap(bitmap, 1000, 1000, false);
             thumb.compress(Bitmap.CompressFormat.JPEG, 100, thumbOut);
             medium.compress(Bitmap.CompressFormat.JPEG, 100, mediumOut);
+
+            mBase64= PhotoUtils.base64Bitmap(PhotoUtils.toGrayScale(thumb));
+
             thumbOut.flush();
             mediumOut.flush();
             thumbOut.close();

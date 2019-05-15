@@ -35,6 +35,7 @@ import com.example.android.gymlogmulti.data.DateConverter;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.data.PaymentEntry;
 import com.example.android.gymlogmulti.data.VisitEntry;
+import com.example.android.gymlogmulti.utils.PhotoUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -607,6 +608,9 @@ public class DataBackup {
                     count++;
                 }catch (Exception e){
                     Log.d("gymlog_failed_restore","inserting client "+id+" failed. please investigate");
+                }
+                if (!photo.isEmpty()||photo!=null) {
+                    PhotoUtils.createGrayScaleThumb(id, photo, mContext);
                 }
 
             }catch (Exception e){

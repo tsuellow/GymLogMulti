@@ -20,6 +20,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.example.android.gymlogmulti.data.ClientEntry;
+import com.example.android.gymlogmulti.utils.PhotoUtils;
 
 import java.io.File;
 import java.util.List;
@@ -145,18 +146,16 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         viewHolder.mProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                String clientMedium=medium.getAbsolutePath();
-                Bitmap bitmap = BitmapFactory.decodeFile(clientMedium);
-                ImageView image = new ImageView(mContext);
+                Bitmap bitmap = PhotoUtils.getAppropriateBitmap(clientId,mContext);
+                ImageView image=new ImageView(mContext);
                 image.setImageBitmap(bitmap);
-
                 AlertDialog.Builder builder =
                         new AlertDialog.Builder(mContext).
                                 setView(image);
                 AlertDialog alertDialog=builder.create();
                 alertDialog.show();
                 alertDialog.getWindow().setLayout(600, 600);
+
             }
         });
 

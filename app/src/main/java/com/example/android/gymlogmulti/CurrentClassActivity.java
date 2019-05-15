@@ -22,7 +22,7 @@ import android.widget.ImageView;
 import com.example.android.gymlogmulti.data.ClientVisitJoin;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.utils.DateMethods;
-
+import com.example.android.gymlogmulti.utils.PhotoUtils;
 
 
 import java.io.ByteArrayInputStream;
@@ -139,15 +139,36 @@ public class CurrentClassActivity extends AppCompatActivity implements CurrentCl
         showImage(clientId);
     }
 
+
+    private void showImage(int clientId) {
+        Bitmap bitmap =PhotoUtils.getAppropriateBitmap(clientId,mContext);
+        ImageView image=new ImageView(mContext);
+        image.setImageBitmap(bitmap);
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(this).
+                        setView(image);
+        AlertDialog alertDialog=builder.create();
+        alertDialog.show();
+        alertDialog.getWindow().setLayout(600, 600);
+    }
+
 //    private void showImage(int clientId) {
-//        String imageFileName = "MEDIUM_" + clientId ;
+//        String imageFileName = "THUMB_" + clientId ;
 //        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 //        File medium = new File(storageDir, imageFileName + ".jpg");
 //        String clientMedium=medium.getAbsolutePath();
 //        ImageView image = new ImageView(this);
 //        if (medium.exists()) {
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
 //            Bitmap bitmap = BitmapFactory.decodeFile(clientMedium);
-//            image.setImageBitmap(bitmap);
+//            bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
+//            byte[] b = baos.toByteArray();
+//            String encodedString = Base64.encodeToString(b, 0);
+//
+//            byte[] biteOutput=Base64.decode(encodedString,0);
+//            Bitmap bitmapDeco = BitmapFactory.decodeByteArray(biteOutput, 0, biteOutput.length);
+//
+//            image.setImageBitmap(Bitmap.createScaledBitmap(bitmapDeco, 600, 600, true));
 //        }else{
 //            image.setImageResource(android.R.drawable.ic_menu_camera);
 //        }
@@ -159,33 +180,4 @@ public class CurrentClassActivity extends AppCompatActivity implements CurrentCl
 //        alertDialog.show();
 //        alertDialog.getWindow().setLayout(600, 600);
 //    }
-
-    private void showImage(int clientId) {
-        String imageFileName = "THUMB_" + clientId ;
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File medium = new File(storageDir, imageFileName + ".jpg");
-        String clientMedium=medium.getAbsolutePath();
-        ImageView image = new ImageView(this);
-        if (medium.exists()) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Bitmap bitmap = BitmapFactory.decodeFile(clientMedium);
-            bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
-            byte[] b = baos.toByteArray();
-            String encodedString = Base64.encodeToString(b, 0);
-
-            byte[] biteOutput=Base64.decode(encodedString,0);
-            Bitmap bitmapDeco = BitmapFactory.decodeByteArray(biteOutput, 0, biteOutput.length);
-
-            image.setImageBitmap(Bitmap.createScaledBitmap(bitmapDeco, 600, 600, true));
-        }else{
-            image.setImageResource(android.R.drawable.ic_menu_camera);
-        }
-
-        AlertDialog.Builder builder =
-                new AlertDialog.Builder(this).
-                        setView(image);
-        AlertDialog alertDialog=builder.create();
-        alertDialog.show();
-        alertDialog.getWindow().setLayout(600, 600);
-    }
 }

@@ -48,6 +48,7 @@ import com.example.android.gymlogmulti.data.ClientEntry;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.utils.DateMethods;
 import com.example.android.gymlogmulti.utils.PhoneUtilities;
+import com.example.android.gymlogmulti.utils.PhotoUtils;
 import com.example.android.gymlogmulti.utils.QrCodeUtilities;
 
 import java.io.File;
@@ -76,6 +77,7 @@ public class NewClientActivity extends AppCompatActivity {
     DatePickerDialog.OnDateSetListener onDateSetListener;
     Date dateOfBirth=null;
     int isNew=-1;
+    String mBase64;
 
 
     private GymDatabase mDb;
@@ -185,6 +187,8 @@ public class NewClientActivity extends AppCompatActivity {
                             requestPermissions(permissionRequested, REQUEST_CODE);
                         }
 
+                    }else{
+                        dispatchTakePictureIntent();
                     }
                 }
 
@@ -262,6 +266,8 @@ public class NewClientActivity extends AppCompatActivity {
                     });
                 }
             });
+
+            //Toast.makeText(getApplicationContext(),""+mBase64.length()+" vs. "+colorTest.length(),Toast.LENGTH_LONG).show();
 
             Intent i=new Intent(getApplicationContext(),SearchActivity.class);
             startActivity(i);
@@ -387,10 +393,10 @@ public class NewClientActivity extends AppCompatActivity {
             String lastName=mLastName.getText().toString();
             String phone=mPhone.getText().toString();
             String occupation=mOccupation.getText().toString();
-            String photoDir=createImageFile().getAbsolutePath();
+            //String photoDir=createImageFile().getAbsolutePath();
             Date date=new Date();
 
-            final ClientEntry clientEntry=new ClientEntry(id,firstName,lastName,dateOfBirth,gender,occupation,phone, photoDir, null, date);
+            final ClientEntry clientEntry=new ClientEntry(id,firstName,lastName,dateOfBirth,gender,occupation,phone, mBase64, null, date);
             AppExecutors.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -515,8 +521,10 @@ public class NewClientActivity extends AppCompatActivity {
 
             Bitmap thumb = Bitmap.createScaledBitmap(bitmap, 96, 96, false);
             Bitmap medium = Bitmap.createScaledBitmap(bitmap, 1000, 1000, false);
-//            String qrText="{\"obj\":\"l\",\"ufid\":"+mId.getText().toString()+"}";
-//            Bitmap qrCode= QrCodeUtilities.GenerateQrCode(getApplicationContext(),qrText);
+
+            mBase64= PhotoUtils.base64Bitmap(PhotoUtils.toGrayScale(thumb));
+
+
             thumb.compress(Bitmap.CompressFormat.JPEG, 100, thumbOut);
             medium.compress(Bitmap.CompressFormat.JPEG, 100, mediumOut);
 

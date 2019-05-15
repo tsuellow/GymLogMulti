@@ -30,6 +30,7 @@ import com.example.android.gymlogmulti.data.PaymentEntry;
 import com.example.android.gymlogmulti.data.VisitEntry;
 import com.example.android.gymlogmulti.utils.DateMethods;
 import com.example.android.gymlogmulti.utils.PhoneUtilities;
+import com.example.android.gymlogmulti.utils.PhotoUtils;
 
 import java.io.File;
 import java.util.Date;
@@ -218,21 +219,7 @@ public class ClientProfileActivity extends AppCompatActivity {
                 mPhone.setText(str_phone);
 
                 //set photo
-                String idPart = String.valueOf(clientEntry.getId());
-                String imageFileName = "MEDIUM_" + idPart ;
-                File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-                final File medium = new File(storageDir, imageFileName + ".jpg");
-                if (medium.exists()) {
-                    String thumb = medium.getAbsolutePath();
-                    Bitmap bitmap = BitmapFactory.decodeFile(thumb);
-                    RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), bitmap);
-                    roundedBitmapDrawable.setCircular(true);
-                    mProfilePhoto.setImageDrawable(roundedBitmapDrawable);
-                }
-                else{
-                    mProfilePhoto.setImageResource(R.drawable.camera);
-                }
-
+                PhotoUtils.getAppropriateBitmapRounded(clientEntry.getId(),mContext,mProfilePhoto);
 
             }
         });
