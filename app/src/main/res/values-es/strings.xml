@@ -196,7 +196,7 @@
     <string name="error_timeout">La conexión caducó, revisá tu conexión a internet e intentalo de nuevo en un rato</string>
     <string name="branch">Sucursal:</string>
     <string name="data_sync_finished">Sincronización finalizada</string>
-    <string name="days_of_week">Días</string>
+    <string name="days_of_week">Días:</string>
     <string name="fri">vie</string>
     <string name="mon">lun</string>
     <string name="restore_failed">Actualización fallida!</string>
@@ -208,4 +208,7 @@
     <string name="tue">mar</string>
     <string name="wed">mie</string>
     <string name="need_phone">Tenés que proporcionar un numero telefónico para que esto funcione</string>
+    <string name="and">y</string>
+    <string name="id_between">Id debe estar entre</string>
+    <string name="id_not_in_range">Id fuera de límites</string>
 </resources>

@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
@@ -71,10 +72,13 @@ public class MainActivity extends AppCompatActivity{
 
     public static final String GYM_ID="mm";
     public static final String USER_NAME="TestGymMulti";
-    public static final String GYM_BRANCH="UNIQUE";
+    public static final String GYM_BRANCH="amazon";
     public static final String COMPANY_NAME="My Gym Empire";
     public static final String COMPANY_OWNER="Fulano de Tal";
     public static final boolean IS_MULTI=true;
+    public static final int RANGE_FROM=30;
+    public static final int RANGE_TO=2000;
+
 
 
     public static final String CHANNEL_ID="111";
@@ -89,6 +93,7 @@ public class MainActivity extends AppCompatActivity{
     private ImageView mFlashLight;
     private ConstraintLayout mTopBar;
     private LinearLayout mBottomBar;
+    private ConstraintLayout mToolbarBackground;
     private int mBarColor, mTextColor;
     private TextView mOrientation;
     private boolean mIsAnimated;
@@ -123,6 +128,7 @@ public class MainActivity extends AppCompatActivity{
         mFlashLight=(ImageView) findViewById(R.id.iv_flash_light);
         mTopBar=(ConstraintLayout) findViewById(R.id.cl_main_top);
         mBottomBar=(LinearLayout) findViewById(R.id.ll_main_bottom);
+        mToolbarBackground=(ConstraintLayout) findViewById(R.id.tb_background);
         mBarColor=mBottomBar.getSolidColor();
         mTextColor=mOrientation.getCurrentTextColor();
         mIsAnimated=false;
@@ -134,6 +140,7 @@ public class MainActivity extends AppCompatActivity{
                     mOrientation.setTextColor(Color.parseColor("#757575"));
                     mTopBar.setBackgroundColor(getResources().getColor(R.color.colorWhite));
                     mBottomBar.setBackgroundColor(getResources().getColor(R.color.colorWhite));
+                    mToolbarBackground.setBackgroundColor(getResources().getColor(R.color.colorWhite));
                     //dalay change to normal by 3 seconds
                     Handler handler = new Handler();
                     Runnable runnable = new Runnable() {
@@ -195,6 +202,11 @@ public class MainActivity extends AppCompatActivity{
         colorAnimBottom.setDuration(1000);
         colorAnimBottom.setEvaluator(new ArgbEvaluator());
         colorAnimBottom.start();
+        ObjectAnimator colorAnimBackground = ObjectAnimator.ofInt(mToolbarBackground, "backgroundColor",
+                getResources().getColor(R.color.colorWhite), mBarColor);
+        colorAnimBackground.setDuration(1000);
+        colorAnimBackground.setEvaluator(new ArgbEvaluator());
+        colorAnimBackground.start();
         ObjectAnimator colorAnimText = ObjectAnimator.ofInt(mOrientation, "textColor",
                 Color.parseColor("#757575"), mTextColor);
         colorAnimText.setDuration(1000);

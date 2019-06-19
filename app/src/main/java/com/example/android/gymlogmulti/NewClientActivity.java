@@ -329,8 +329,9 @@ public class NewClientActivity extends AppCompatActivity {
     }
     private boolean checkId(){
         String id=mId.getText().toString().trim();
+        int idInt;
         try {
-            Integer.parseInt(id);
+            idInt=Integer.parseInt(id);
         }catch(Exception e){
             ilId.setErrorEnabled(true);
             ilId.setError(getString(R.string.id_has_to_be_numeric));
@@ -339,13 +340,23 @@ public class NewClientActivity extends AppCompatActivity {
             return false;
         }
 
-        if (isNew==1){
+        boolean isInRange= ((idInt>=MainActivity.RANGE_FROM && idInt<=MainActivity.RANGE_TO)||idInt<0);
+
+
+
+        if (isNew==1 && isInRange){
             ilId.setErrorEnabled(false);
             return  true;
         }else if (isNew==0){
             ilId.setErrorEnabled(true);
             ilId.setError(getString(R.string.id_has_to_be_new));
             mId.setError(getString(R.string.id_has_to_be_new));
+            //Toast.makeText(this,"Id needs to be new", Toast.LENGTH_LONG).show();
+            return false;
+        }else if (!isInRange){
+            ilId.setErrorEnabled(true);
+            ilId.setError(getString(R.string.id_between)+" "+MainActivity.RANGE_FROM+" "+getString(R.string.and)+" "+MainActivity.RANGE_TO);
+            //mId.setError(getString(R.string.id_not_in_range));
             //Toast.makeText(this,"Id needs to be new", Toast.LENGTH_LONG).show();
             return false;
         }else{

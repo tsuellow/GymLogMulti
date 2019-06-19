@@ -259,10 +259,17 @@ public class DataBackup {
         TextView mBackupMessage=(TextView) mView.findViewById(R.id.tv_backup_message);
         mBackupMessage.setText(messageBackup);
 
-        TextView mRestoreTitle=(TextView) mView.findViewById(R.id.tv_restore_title);
-        mRestoreTitle.setText(titleRestore);
-        TextView mRestoreMessage=(TextView) mView.findViewById(R.id.tv_restore_message);
-        mRestoreMessage.setText(messageRestore);
+        TextView mRestoreTitle = (TextView) mView.findViewById(R.id.tv_restore_title);
+        TextView mRestoreMessage = (TextView) mView.findViewById(R.id.tv_restore_message);
+        if (MainActivity.IS_MULTI) {
+            mRestoreTitle.setText(titleRestore);
+            mRestoreMessage.setText(messageRestore);
+        }else {
+            mRestoreTitle.setText("");
+            mRestoreMessage.setText("");
+            mRestoreTitle.setHeight(0);
+            mRestoreMessage.setHeight(0);
+        }
 
         Button mClose=(Button) mView.findViewById(R.id.btn_close);
         mBuilder.setTitle(R.string.data_sync_finished);
