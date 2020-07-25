@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.os.Environment;
 import android.util.Log;
 
+import com.example.android.gymlogmulti.Constants;
 import com.example.android.gymlogmulti.MainActivity;
 import com.example.android.gymlogmulti.R;
 import com.google.zxing.BarcodeFormat;
@@ -76,7 +77,7 @@ public class QrCodeUtilities {
             //setting bitmap to image view
 
             Bitmap overlayBig = BitmapFactory.decodeResource(context.getResources(),R.drawable.qr_image_2);
-            Bitmap overlay = Bitmap.createScaledBitmap(overlayBig, 168, 168, false);
+            Bitmap overlay = Bitmap.createScaledBitmap(overlayBig, Constants.qrDims, Constants.qrDims, false);
 
             return mergeBitmaps(overlay,bitmap);
 

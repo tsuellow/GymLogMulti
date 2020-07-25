@@ -2,7 +2,6 @@ package com.example.android.gymlogmulti;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
@@ -11,19 +10,18 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.FileProvider;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.InputType;
 import android.util.Log;
@@ -39,7 +37,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.design.widget.TextInputLayout;
 
 import com.example.android.gymlogmulti.data.ClientEntry;
 import com.example.android.gymlogmulti.data.GymDatabase;
@@ -51,8 +48,6 @@ import com.example.android.gymlogmulti.utils.QrCodeUtilities;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -153,16 +148,26 @@ public class ModifyClientActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (checkSelfPermission(Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED) {
-                        dispatchTakePictureIntent();
+                mTakePic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
 
-                    }else{
-                        String[] permissionRequested={Manifest.permission.CAMERA};
-                        requestPermissions(permissionRequested, REQUEST_CODE);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                if (checkSelfPermission(Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED) {
+                                    dispatchTakePictureIntent();
+
+                                }else{
+                                    String[] permissionRequested={Manifest.permission.CAMERA};
+                                    requestPermissions(permissionRequested, REQUEST_CODE);
+                                }
+
+                            }else{
+                                dispatchTakePictureIntent();
+                            }
+
+
                     }
-
-                }
+                });
 
 
             }
@@ -349,13 +354,16 @@ public class ModifyClientActivity extends AppCompatActivity {
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
             File photoFile = null;
+            if (Constants.USER_NAME=="CosmosGym"){
+                createImageFile().delete();
+            }
 
                 photoFile = createImageFile();
 
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider_gymlogmulti",
+                        getResources().getString(R.string.file_provider),
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
@@ -380,6 +388,9 @@ public class ModifyClientActivity extends AppCompatActivity {
         int cropH = (height - width) / 2;
         cropH = (cropH < 0)? 0: cropH;
         Bitmap cropImg = Bitmap.createBitmap(bitmap, cropW, cropH, newWidth, newHeight);
+        if (Constants.USER_NAME=="CosmosGym"){
+            cropImg=rotateImage(cropImg,270);
+        }
         savePhotoThumbMed(cropImg);
         if (createImageFile().exists()){
             createImageFile().delete();
@@ -398,6 +409,13 @@ public class ModifyClientActivity extends AppCompatActivity {
 //            mPhoto.setImageResource(R.drawable.camera);
 //        }
 
+    }
+
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 
 

@@ -3,7 +3,6 @@ package com.example.android.gymlogmulti;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,37 +12,31 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Build;
-import android.os.Environment;
+import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.android.gymlogmulti.data.ClientEntry;
-import com.example.android.gymlogmulti.data.DateConverter;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.data.PaymentEntry;
 import com.example.android.gymlogmulti.data.VisitEntry;
@@ -56,10 +49,10 @@ import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 import com.journeyapps.barcodescanner.DefaultDecoderFactory;
 import com.journeyapps.barcodescanner.camera.CameraSettings;
-import android.view.Menu;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.io.File;
+
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -70,14 +63,14 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity{
 
-    public static final String GYM_ID="mm";
-    public static final String USER_NAME="TestGymMulti";
-    public static final String GYM_BRANCH="amazon";
-    public static final String COMPANY_NAME="My Gym Empire";
-    public static final String COMPANY_OWNER="Fulano de Tal";
-    public static final boolean IS_MULTI=true;
-    public static final int RANGE_FROM=30;
-    public static final int RANGE_TO=2000;
+    public static final String GYM_ID=Constants.GYM_ID;
+    public static final String USER_NAME=Constants.USER_NAME;
+    public static final String GYM_BRANCH=Constants.GYM_BRANCH;
+    public static final String COMPANY_NAME=Constants.COMPANY_NAME;
+    public static final String COMPANY_OWNER=Constants.COMPANY_OWNER;
+    public static final boolean IS_MULTI=Constants.IS_MULTI;
+    public static final int RANGE_FROM=Constants.RANGE_FROM;
+    public static final int RANGE_TO=Constants.RANGE_TO;
 
 
 
@@ -120,6 +113,7 @@ public class MainActivity extends AppCompatActivity{
         }else{
             cameraSettings.setRequestedCameraId(0);
         }
+        
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

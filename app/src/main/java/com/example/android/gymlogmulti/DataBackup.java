@@ -1,6 +1,5 @@
 package com.example.android.gymlogmulti;
 
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -10,15 +9,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -50,11 +47,13 @@ import java.util.concurrent.CountDownLatch;
 public class DataBackup {
     Context mContext;
     SharedPreferences sharedPreferences;
+    private String SERVER_URL;
 
 
     public DataBackup(Context context, SharedPreferences sharedPrefs) {
         mContext=context;
         sharedPreferences=sharedPrefs;
+        SERVER_URL=sharedPrefs.getString("serveraddress","https://www.id-ex.de/GymLogMulti/php/");
     }
 
     //String HOST_ADDRESS = sharedPreferences.getString("serverip", "192.168.1.6");
@@ -85,7 +84,10 @@ public class DataBackup {
 
 
 //    public String SERVER_URL="http://"+HOST_ADDRESS.trim()+"/gymlog/";
-    public String SERVER_URL="https://www.id-ex.de/GymLogMulti/php/";
+//    public String SERVER_URL="https://www.id-ex.de/GymLogMulti/php/";
+
+
+
 
     private String titleBackup;
     private String messageBackup;

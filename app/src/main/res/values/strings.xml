@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">GymLogMulti</string>
+    <string name="app_label" translatable="false">GymLog</string>
+    <string name="file_provider" translatable="false">com.example.android.fileprovider_gymlogmulti</string>
 
 
     <string name="err_first_name">Please enter first name</string>
@@ -30,6 +32,11 @@
         <item>@string/month</item>
         <item>@string/other</item>
     </string-array>
+
+    <string-array name="product_array2">
+        <!--empty placeholder-->
+    </string-array>
+
     <string name="week">Week</string>
     <string name="fortnight">Fortnight</string>
     <string name="month">Month</string>
@@ -251,6 +258,17 @@
     <string name="id_between">Id has to be between</string>
     <string name="and">and</string>
     <string name="id_not_in_range">Id is not in range</string>
+    <string name="gym_data">Gym Data</string>
+    <string name="company_name">Company name:</string>
+    <string name="company_owner">Company owner:</string>
+    <string name="admin_pin">Admin PIN</string>
+    <string name="backup_server_address">Backup Server address</string>
+    <string name="do_not_alter">Do not alter unless instructed by system admin</string>
+    <string name="change_server">Change server address</string>
+    <string name="server_address">Server address</string>
+    <string name="server_changed">server address has been changed successfully</string>
+    <string name="error_server_change">an error has occurred, try again</string>
+    <string name="wrong_admin_pin">wrong Admin PIN</string>
 
 
 </resources>

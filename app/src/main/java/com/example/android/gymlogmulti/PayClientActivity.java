@@ -3,23 +3,21 @@ package com.example.android.gymlogmulti;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -33,8 +31,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.support.v7.widget.Toolbar;
-import android.widget.Toast;
 
 import com.example.android.gymlogmulti.data.ClientEntry;
 import com.example.android.gymlogmulti.data.GymDatabase;
@@ -42,8 +38,6 @@ import com.example.android.gymlogmulti.data.PaymentEntry;
 import com.example.android.gymlogmulti.utils.DateMethods;
 import com.github.aakira.expandablelayout.ExpandableLinearLayout;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -116,8 +110,15 @@ public class PayClientActivity extends AppCompatActivity {
         mComment=(EditText) findViewById(R.id.ev_comment);
 
         mProduct=(AutoCompleteTextView) findViewById(R.id.actv_product);
-        final ArrayAdapter<String> prodAdapter=new ArrayAdapter<String>(PayClientActivity.this,
-                android.R.layout.simple_list_item_1,getResources().getStringArray(R.array.product_array));
+        final ArrayAdapter<String> prodAdapter;
+        if (Constants.customProducts){
+            prodAdapter=new ArrayAdapter<String>(PayClientActivity.this,
+                    android.R.layout.simple_list_item_1,getResources().getStringArray(R.array.product_array2));
+        }else{
+            prodAdapter=new ArrayAdapter<String>(PayClientActivity.this,
+                    android.R.layout.simple_list_item_1,getResources().getStringArray(R.array.product_array));
+        }
+
         mProduct.setAdapter(prodAdapter);
         mProduct.setKeyListener(null);
         mProduct.setOnTouchListener(new View.OnTouchListener(){
@@ -135,20 +136,27 @@ public class PayClientActivity extends AppCompatActivity {
                 Calendar cal=Calendar.getInstance();
                 cal.setTime(dateFrom);
                 String selected=adapterView.getItemAtPosition(i).toString();
-                if(selected.contentEquals(getString(R.string.week))){
-                    cal.add(Calendar.DAY_OF_MONTH,6);
+                if (Constants.customProducts){
+                    cal.add(Calendar.MONTH, 1);
+                    cal.add(Calendar.DAY_OF_MONTH, -1);
+                    dateTo=cal.getTime();
                     mTo.setText(getDateString(cal));
-                }else if(selected.contentEquals(getString(R.string.fortnight))){
-                    cal.add(Calendar.DAY_OF_MONTH,14);
-                    mTo.setText(getDateString(cal));
-                }else if(selected.contentEquals(getString(R.string.month))){
-                    cal.add(Calendar.MONTH,1);
-                    cal.add(Calendar.DAY_OF_MONTH,-1);
-                    mTo.setText(getDateString(cal));
-                }else if(selected.contentEquals(getString(R.string.other))){
-                    mTo.setText(getDateString(cal));
+                }else {
+                    if (selected.contentEquals(getString(R.string.week))) {
+                        cal.add(Calendar.DAY_OF_MONTH, 6);
+                        mTo.setText(getDateString(cal));
+                    } else if (selected.contentEquals(getString(R.string.fortnight))) {
+                        cal.add(Calendar.DAY_OF_MONTH, 14);
+                        mTo.setText(getDateString(cal));
+                    } else if (selected.contentEquals(getString(R.string.month))) {
+                        cal.add(Calendar.MONTH, 1);
+                        cal.add(Calendar.DAY_OF_MONTH, -1);
+                        mTo.setText(getDateString(cal));
+                    } else if (selected.contentEquals(getString(R.string.other))) {
+                        mTo.setText(getDateString(cal));
+                    }
+                    dateTo = cal.getTime();
                 }
-                dateTo=cal.getTime();
 
                 onSelectProductAnimator(mTo);
                 onSelectProductAnimator(mFrom);
@@ -250,6 +258,7 @@ public class PayClientActivity extends AppCompatActivity {
         mFrom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                extra=extra+getString(R.string.from_edit);
                 displayDatePickerDialog(dateFrom,"from",getString(R.string.from));
             }
         });
@@ -258,6 +267,7 @@ public class PayClientActivity extends AppCompatActivity {
         mTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                extra=extra+getString(R.string.to_edit);
                 displayDatePickerDialog(dateTo,"to",getString(R.string.to));
             }
         });

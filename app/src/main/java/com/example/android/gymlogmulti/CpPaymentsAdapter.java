@@ -109,7 +109,7 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
                 final AlertDialog alertDialog=builder.create();
                 alertDialog.setTitle(mContext.getString(R.string.payment_info));
                 alertDialog.setMessage(dialogText);
-                alertDialog.setButton(android.app.AlertDialog.BUTTON_NEGATIVE, mContext.getString(R.string.close), new DialogInterface.OnClickListener() {
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, mContext.getString(R.string.close), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         alertDialog.dismiss();
@@ -130,7 +130,7 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
                 alertDialog.setTitle(mContext.getString(R.string.attention));
                 alertDialog.setMessage(mContext.getString(R.string.are_you_sure)+" "+amount+" "+mContext.getString(R.string.payment_from_period)+
                         " "+from+" "+mContext.getString(R.string.until)+" "+until+" "+mContext.getString(R.string.question_marc));
-                alertDialog.setButton(android.app.AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.yes), new DialogInterface.OnClickListener() {
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.yes), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String extra=payment.getExtra();
                         if(extra==null){extra="";}
@@ -140,7 +140,7 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
                         alertDialog.dismiss();
                     }
                 });
-                alertDialog.setButton(android.app.AlertDialog.BUTTON_NEGATIVE, mContext.getString(R.string.no), new DialogInterface.OnClickListener() {
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, mContext.getString(R.string.no), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         alertDialog.dismiss();

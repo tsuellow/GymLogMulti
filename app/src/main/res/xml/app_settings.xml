@@ -33,7 +33,7 @@
 
         <Preference
             android:key="gymdata"
-            android:title="Gym Data"/>
+            android:title="@string/gym_data"/>
 
     </PreferenceCategory>
 
@@ -53,6 +53,12 @@
         <Preference
             android:title="@string/backup_time"
             android:key="timebackup"/>
+
+        <Preference
+            android:defaultValue="https://www.id-ex.de/GymLogMulti/php/"
+            android:key="serveraddress"
+            android:title="@string/backup_server_address"
+            android:summary="@string/do_not_alter"/>
 
 
     </PreferenceCategory>

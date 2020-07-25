@@ -18,7 +18,7 @@
             android:id="@+id/iv_profile_image_rem"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@drawable/camera"
+            app:srcCompat="@drawable/camera"
             android:tint="@android:color/tab_indicator_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +75,7 @@
                 android:layout_height="25dp"
                 android:padding="4dp"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/whatsapp_icon_black"
+                app:srcCompat="@drawable/whatsapp_icon_black"
                 android:tint="@android:color/tab_indicator_text" />
 
             <TextView

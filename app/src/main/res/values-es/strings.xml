@@ -4,7 +4,7 @@
     <string name="err_last_name">Ingresá tu apellido</string>
     <string name="err_phone">Ingresá un teléfono válido</string>
     <string name="welcome">Pasá adelante</string>
-    <string name="days_access_remaining">dias de acceso restantes</string>
+    <string name="days_access_remaining">días de acceso restantes</string>
     <string name="sorry">Lo sentimos</string>
     <string name="your_access_has_expired">al parecer tu acceso al gimnasio ha expirado.</string>
     <string name="please_pay_access">Por favor procedé a pagar en caja para renovarlo.</string>
@@ -211,4 +211,15 @@
     <string name="and">y</string>
     <string name="id_between">Id debe estar entre</string>
     <string name="id_not_in_range">Id fuera de límites</string>
+    <string name="gym_data">Datos del gimnasio</string>
+    <string name="company_name">Nombre de la empresa:</string>
+    <string name="company_owner">Propietario:</string>
+    <string name="admin_pin">PIN de Admin</string>
+    <string name="backup_server_address">Dirección de servidor de respaldo</string>
+    <string name="change_server">Cambiar dirección de servidor</string>
+    <string name="do_not_alter">No alterar a menos que le sea instruido por el admin</string>
+    <string name="error_server_change">ha ocurrido un error, vuelva a intentarlo</string>
+    <string name="server_address">Dirección de servidor</string>
+    <string name="server_changed">la dirección de servidor ha sido cambiada exitosamente</string>
+    <string name="wrong_admin_pin">PIN de Admin incorrecto, contactá al admin de sistema</string>
 </resources>

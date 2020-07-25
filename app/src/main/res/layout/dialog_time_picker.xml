@@ -11,6 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/tp_time_picker"
+        style="@style/AppTheme"
         android:timePickerMode="clock"/>
 
     <LinearLayout

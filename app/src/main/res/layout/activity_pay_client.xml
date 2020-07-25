@@ -138,6 +138,7 @@
                             android:id="@+id/actv_currency"
                             android:ems="10"
                             android:completionThreshold="0"
+                            android:dropDownWidth="100dp"
                             />
                     </android.support.design.widget.TextInputLayout>
                     <View
@@ -261,7 +262,7 @@
                         android:id="@+id/iv_expandable_arrow"
                         android:layout_width="19dp"
                         android:layout_height="19dp"
-                        android:src="@drawable/sort_down"
+                        app:srcCompat="@drawable/sort_down"
                         android:tint="@android:color/tab_indicator_text"/>
 
                 </LinearLayout>
