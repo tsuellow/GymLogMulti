@@ -1,24 +1,22 @@
 package com.example.android.gymlogmulti;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -221,7 +219,7 @@ public class ClientProfileActivity extends AppCompatActivity {
                 //now set all vars
                 mId.setText("ID: "+clientEntry.getId());
                 mFirstName.setText(clientEntry.getFirstName());
-                mLastName.setText(clientEntry.getLastName());
+                mLastName.setText(clientEntry.getLastName().substring(0,Math.min(10,clientEntry.getLastName().length()))+"...");
                 firstName=clientEntry.getFirstName();
 
                 //dob string
@@ -280,8 +278,10 @@ public class ClientProfileActivity extends AppCompatActivity {
 
         Intent sendIntent = new Intent("android.intent.action.SEND");
 
-        sendIntent.setComponent(new ComponentName("com.whatsapp","com.whatsapp.ContactPicker"));
-        sendIntent.setType("image");
+        //sendIntent.setComponent(new ComponentName("com.whatsapp","com.whatsapp.ContactPicker"));
+        sendIntent.setPackage("com.whatsapp");
+        sendIntent.setType("image/jpeg");
+        sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         sendIntent.putExtra(Intent.EXTRA_STREAM,qrUri);
         sendIntent.putExtra("jid", ""+toNumber+"@s.whatsapp.net");
         sendIntent.putExtra(Intent.EXTRA_TEXT,getString(R.string.hi)+" "+
@@ -289,6 +289,9 @@ public class ClientProfileActivity extends AppCompatActivity {
         startActivity(sendIntent);
     }
 
-
-
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(ClientProfileActivity.this,SearchActivity.class);
+        startActivity(i);
+    }
 }

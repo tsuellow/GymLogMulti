@@ -1,12 +1,12 @@
 package com.example.android.gymlogmulti.data;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.Date;
 import java.util.List;
@@ -27,11 +27,11 @@ public interface ClientDao {
     @Query("SELECT * FROM client WHERE id=:id")
     LiveData<ClientEntry> getClientById(int id);
 
-    @Query("SELECT * FROM client WHERE firstName LIKE :namePart " +
+    @Query("SELECT * FROM client WHERE firstName||lastName LIKE :namePart " +
             "OR lastName LIKE :namePart OR CAST(id as TEXT) LIKE :namePart ORDER BY firstName ASC")
     LiveData<List<ClientEntry>> getClientByName(String namePart);
 
-    @Query("SELECT * FROM client WHERE id>0 AND (firstName LIKE :namePart " +
+    @Query("SELECT * FROM client WHERE id>0 AND (firstName||lastName LIKE :namePart " +
             "OR lastName LIKE :namePart OR CAST(id as TEXT) LIKE :namePart) ORDER BY firstName ASC")
     LiveData<List<ClientEntry>> getRegularClientByName(String namePart);
 

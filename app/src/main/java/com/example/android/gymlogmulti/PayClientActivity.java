@@ -4,18 +4,18 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
@@ -330,6 +330,11 @@ public class PayClientActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+    @Override
+    public void onBackPressed() {
+        getBackToProfile();
+    }
+
     //to be evaluated jointly on submit
     private void onSubmit(){
         boolean productCorrect=checkProduct();
@@ -427,7 +432,7 @@ public class PayClientActivity extends AppCompatActivity {
                 client.removeObserver(this);
                 mClientEntry=clientEntry;
                 if (mClientEntry!=null) {
-                    String nameFull = mClientEntry.getFirstName() + " " + mClientEntry.getLastName();
+                    String nameFull = mClientEntry.getFirstName() + " " + mClientEntry.getLastName().substring(0,Math.min(10,clientEntry.getLastName().length()))+"...";
                     mName.setText(nameFull);
                 }
 

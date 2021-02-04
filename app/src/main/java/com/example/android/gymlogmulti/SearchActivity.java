@@ -1,8 +1,8 @@
 package com.example.android.gymlogmulti;
 
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,16 +11,16 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.core.view.MenuItemCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -99,12 +99,18 @@ public class SearchActivity extends AppCompatActivity {
         packageManager = this.getPackageManager();
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(SearchActivity.this, MainActivity.class);
+        startActivity(i);;
+    }
+
     public static Context getAppCont(){
         return appContext;
     }
 
     private void populateDataSource(String s) {
-        String str = s + "%";
+        String str = s.replace(" ","%") + "%";
 
         final LiveData<List<ClientEntry>> clients = mDb.clientDao().getClientByName(str);
         clients.observe(this, new Observer<List<ClientEntry>>() {
@@ -213,7 +219,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void csvDialog(final String path){
-        android.support.v7.app.AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final AlertDialog alertDialog=builder.create();
 
         alertDialog.setTitle(getString(R.string.csv_created));

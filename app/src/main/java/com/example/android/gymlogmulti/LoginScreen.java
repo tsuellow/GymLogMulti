@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.view.Gravity;
@@ -30,12 +30,14 @@ public class LoginScreen extends AppCompatActivity {
         final String currentPin=sharedPreferences.getString("changepin","2987");
         final String currentOwnerPin=sharedPreferences.getString("changeownerpin","2987");
 
-        Intent i=getIntent();
-        final String goal=i.getExtras().getString("goal");
+        final Intent intent=getIntent();
+        final String goal=intent.getExtras().getString("goal");
 
 
 
         otpView = findViewById(R.id.otp_view);
+        otpView.requestFocus();
+        //otpView.setShowSoftInputOnFocus(false);
 
         otpView.setOtpCompletionListener(new OnOtpCompletionListener() {
             @Override public void onOtpCompleted(String otp) {
@@ -45,6 +47,14 @@ public class LoginScreen extends AppCompatActivity {
                         startActivity(i);
                     }else if (goal.contentEquals("manual_search")){
                         Intent i = new Intent(LoginScreen.this, ClientsSearchActivity.class);
+                        startActivity(i);
+                    }else if (goal.contentEquals("recent_visits")){
+                        Intent currentClass= new Intent(getApplicationContext(),CurrentClassActivity.class);
+                        startActivity(currentClass);
+                    }else if (goal.contentEquals("view_client")){
+                        int id = intent.getExtras().getInt("CLIENT_ID");
+                        Intent i = new Intent(getApplicationContext(),ClientProfileActivity.class);
+                        i.putExtra("CLIENT_ID",id);
                         startActivity(i);
                     }
                 }else{

@@ -7,7 +7,7 @@
     android:padding="32dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/lo_old_pin"
         android:layout_marginTop="10dp"
         android:layout_gravity="center_horizontal"
@@ -24,9 +24,9 @@
             android:ems="10"
             android:inputType="number"
             />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/lo_new_pin1"
         android:layout_marginTop="10dp"
         android:layout_gravity="center_horizontal"
@@ -43,9 +43,9 @@
             android:ems="10"
             android:inputType="numberPassword"
             />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/lo_new_pin2"
         android:layout_marginTop="10dp"
         android:layout_gravity="center_horizontal"
@@ -62,7 +62,7 @@
             android:ems="10"
             android:inputType="numberPassword"
             />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
 
         <LinearLayout

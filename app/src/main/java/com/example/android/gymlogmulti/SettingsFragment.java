@@ -3,13 +3,17 @@ package com.example.android.gymlogmulti;
 import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.preference.EditTextPreference;
-import android.support.v7.preference.ListPreference;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceManager;
+import androidx.annotation.Nullable;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreference;
+
+import android.preference.PreferenceFragment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,17 +21,20 @@ import android.widget.Toast;
 
 import com.example.android.gymlogmulti.data.DateConverter;
 import com.example.android.gymlogmulti.data.GymDatabase;
-import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
+//import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
 import java.util.Date;
+
+import static java.security.AccessController.getContext;
 
 //import android.support.v7.preference.PreferenceFragmentCompat;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    EditTextPreference gymName;
+    EditTextPreference gymName, doorDuration;
     Preference changePin, changeOwnerPin, backupAll, restoreAll, backupTime, exchangeRate, singlePassMinus1, singlePassMinus2, gymData, serverAddress;
     ListPreference preferredCurrency;
+    SwitchPreference connectDoor, useProximitySensor;
     TimePickerDialog.OnTimeSetListener onTimeSetListenerBackup;
     GymDatabase mDb;
 
@@ -35,7 +42,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
 
     @Override
-    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
+    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.app_settings,rootKey);
 
         sharedPreferences=PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -117,6 +124,32 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         });
 
         preferredCurrency = (ListPreference) findPreference("preferredcurrency");
+
+        connectDoor=(SwitchPreference) findPreference("doorconnect") ;
+        useProximitySensor=(SwitchPreference) findPreference("doorproximity");
+        doorDuration=(EditTextPreference) findPreference("doorduration");
+        if (sharedPreferences.getBoolean("doorconnect",false)){
+            useProximitySensor.setEnabled(true);
+            doorDuration.setEnabled(true);
+        }else{
+            useProximitySensor.setEnabled(false);
+            doorDuration.setEnabled(false);
+        }
+        connectDoor.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if ((boolean) newValue){
+                    ((SwitchPreference)preference).setChecked(true);
+                    useProximitySensor.setEnabled(true);
+                    doorDuration.setEnabled(true);
+                }else{
+                    useProximitySensor.setEnabled(false);
+                    doorDuration.setEnabled(false);
+                }
+
+                return connectDoor.isChecked();
+            }
+        });
 
 
 

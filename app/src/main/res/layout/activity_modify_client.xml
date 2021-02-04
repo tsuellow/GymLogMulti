@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/lo_id_mod"
                 android:layout_marginTop="10dp"
                 android:layout_gravity="center_horizontal"
@@ -32,7 +32,7 @@
                     android:id="@+id/tv_id_mod"/>
 
 
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:layout_width="fill_parent"
@@ -44,7 +44,7 @@
         </LinearLayout>
 
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/lo_first_name_mod"
             android:layout_marginTop="10dp"
             android:layout_gravity="center_horizontal"
@@ -58,10 +58,10 @@
                 android:id="@+id/ev_first_name_mod"
                 android:ems="10"
                 />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/lo_last_name_mod"
             android:layout_marginTop="10dp"
             android:layout_gravity="center_horizontal"
@@ -75,10 +75,10 @@
                 android:id="@+id/ev_last_name_mod"
                 android:ems="10"
                 />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/lo_occupation_mod"
         android:layout_marginTop="10dp"
         android:layout_gravity="center_horizontal"
@@ -93,10 +93,10 @@
             android:ems="10"
             android:completionThreshold="0"
             />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/lo_phone_mod"
             android:layout_marginTop="10dp"
             android:layout_gravity="center_horizontal"
@@ -111,7 +111,7 @@
                 android:ems="10"
                 android:inputType="phone"
                 />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
 
         <LinearLayout
@@ -123,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/lo_dob_mod"
                     android:layout_marginTop="10dp"
                     android:layout_gravity="center_horizontal"
@@ -138,7 +138,7 @@
                         android:id="@+id/ev_dob_mod"
                         android:ems="10"
                         />
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
 
 

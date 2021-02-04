@@ -4,7 +4,7 @@ public class Constants {
     public static final int qrDims=168;
     public static final boolean customProducts=false;
 
-    public static final String GYM_ID="zz";
+    public static final String GYM_ID="z1";
     public static final String USER_NAME="TestGymMulti";
     public static final String GYM_BRANCH="NOWHERE2";
     public static final String COMPANY_NAME="My Gym Empire";

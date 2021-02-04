@@ -8,12 +8,12 @@
     android:orientation="vertical"
     tools:context=".PayClientActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_pay"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -21,7 +21,7 @@
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -91,7 +91,7 @@
 
 
             <LinearLayout
-                android:layout_width="308dp"
+                android:layout_width="332dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_gravity="center_horizontal">
@@ -101,7 +101,7 @@
                     android:gravity="center|center_horizontal"
                     android:orientation="horizontal">
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/lo_product"
                         android:layout_marginTop="10dp"
                         android:layout_gravity="center_horizontal"
@@ -115,19 +115,20 @@
                             android:id="@+id/actv_product"
                             android:ems="10"
                             android:completionThreshold="0"
+                            android:dropDownWidth="180dp"
                             />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <View
                         android:layout_width="12dp"
                         android:layout_height="match_parent"/>
 
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/lo_currency"
                         android:layout_marginTop="10dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_width="62dp"
+                        android:layout_width="74dp"
                         android:layout_height="wrap_content">
 
                         <AutoCompleteTextView
@@ -140,16 +141,16 @@
                             android:completionThreshold="0"
                             android:dropDownWidth="100dp"
                             />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
                     <View
                         android:layout_width="2dp"
                         android:layout_height="match_parent"/>
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/lo_price"
                         android:layout_marginTop="10dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_width="84dp"
+                        android:layout_width="96dp"
                         android:layout_height="wrap_content">
 
                         <EditText
@@ -161,7 +162,7 @@
                             android:id="@+id/ev_price"
                             android:ems="10"
                             />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
 
                 </LinearLayout>
@@ -172,11 +173,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/lo_from"
                         android:layout_marginTop="10dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_width="148dp"
+                        android:layout_width="160dp"
                         android:layout_height="wrap_content">
 
                         <EditText
@@ -188,17 +189,17 @@
                             android:id="@+id/ev_from"
                             android:ems="10"
                             />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <View
                         android:layout_width="12dp"
                         android:layout_height="match_parent"/>
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/lo_to"
                         android:layout_marginTop="10dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_width="148dp"
+                        android:layout_width="160dp"
                         android:layout_height="wrap_content">
 
                         <EditText
@@ -210,7 +211,7 @@
                             android:id="@+id/ev_to"
                             android:ems="10"
                             />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
                 <View
@@ -270,6 +271,7 @@
             </LinearLayout>
 
             <com.github.aakira.expandablelayout.ExpandableLinearLayout
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/ell_advanced"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -285,7 +287,7 @@
                     android:gravity="center|center_horizontal"
                     android:orientation="horizontal">
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/lo_from_time"
                         android:layout_width="148dp"
                         android:layout_height="wrap_content"
@@ -300,13 +302,13 @@
                             android:focusableInTouchMode="false"
                             android:hint="@string/from_time"
                             android:textAlignment="center" />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <View
                         android:layout_width="12dp"
                         android:layout_height="match_parent" />
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/lo_to_time"
                         android:layout_width="148dp"
                         android:layout_height="wrap_content"
@@ -321,19 +323,18 @@
                             android:focusableInTouchMode="false"
                             android:hint="@string/to_time"
                             android:textAlignment="center" />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
 
                 </LinearLayout>
-                <com.google.android.flexbox.FlexboxLayout
-                    android:layout_width="match_parent"
+
+                <LinearLayout
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    app:justifyContent="center"
-                    app:alignItems="center"
                     android:paddingTop="16dp"
-                    android:paddingBottom="16dp"
-                    app:flexWrap="wrap">
+                    android:paddingBottom="16dp">
                     <CheckBox
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -391,7 +392,7 @@
                         android:layout_weight="1"
                         android:checked="true"
                         android:paddingRight="12dp"/>
-                </com.google.android.flexbox.FlexboxLayout>
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"

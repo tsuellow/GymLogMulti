@@ -6,8 +6,8 @@ import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,11 +19,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +36,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.gymlogmulti.bluetooth.DoorController;
 import com.example.android.gymlogmulti.data.ClientEntry;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.data.PaymentEntry;
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity{
     private ClientEntry mClientData;
     private PaymentEntry mPaymentData;
     private Toolbar mToolbar;
-    private ImageView mFlashLight;
+    private ImageView mFlashLight, mDoor;
     private ConstraintLayout mTopBar;
     private LinearLayout mBottomBar;
     private ConstraintLayout mToolbarBackground;
@@ -92,6 +93,8 @@ public class MainActivity extends AppCompatActivity{
     private boolean mIsAnimated;
 
     SharedPreferences sharedPreferences;
+
+    DoorController doorController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +123,7 @@ public class MainActivity extends AppCompatActivity{
         //set multiple vars
         mOrientation=(TextView) findViewById(R.id.tv_orientation);
         mFlashLight=(ImageView) findViewById(R.id.iv_flash_light);
+        mDoor= findViewById((R.id.iv_door));
         mTopBar=(ConstraintLayout) findViewById(R.id.cl_main_top);
         mBottomBar=(LinearLayout) findViewById(R.id.ll_main_bottom);
         mToolbarBackground=(ConstraintLayout) findViewById(R.id.tb_background);
@@ -148,6 +152,12 @@ public class MainActivity extends AppCompatActivity{
                 }
             }
         });
+
+        if (sharedPreferences.getBoolean("doorconnect",false)){
+            mDoor.setVisibility(View.VISIBLE);
+        }else{
+            mDoor.setVisibility(View.GONE);
+        }
 
         mManualSearch =(Button) findViewById(R.id.bt_search);
 
@@ -182,6 +192,9 @@ public class MainActivity extends AppCompatActivity{
 
         createNotificationChannel();
         resetAlarm();
+        //bluetooth test
+        doorController=new DoorController(this);
+        doorController.initializeBluetooth();
     }
 
     //flashlight method
@@ -269,8 +282,14 @@ public class MainActivity extends AppCompatActivity{
                 break;
             }
             case R.id.opt_class:{
-                Intent currentClass= new Intent(getApplicationContext(),CurrentClassActivity.class);
-                startActivity(currentClass);
+                if (ConstantsTest.IS_HIGH_SECURITY){
+                    Intent login =new Intent(getApplicationContext(),LoginScreen.class);
+                    login.putExtra("goal","recent_visits");
+                    startActivity(login);
+                }else{
+                    Intent currentClass= new Intent(getApplicationContext(),CurrentClassActivity.class);
+                    startActivity(currentClass);
+                }
                 break;
             }
         }
@@ -437,6 +456,7 @@ public class MainActivity extends AppCompatActivity{
             }else{
                 mFirstLineBottom.setTextColor(getResources().getColor(android.R.color.secondary_text_dark));
             }
+            doorController.sendOpenDoorMsg();
         }else{
             mTopStrip.setBackgroundColor(getResources().getColor(R.color.colorRed));
             mBottomStrip.setBackgroundColor(getResources().getColor(R.color.colorRed));

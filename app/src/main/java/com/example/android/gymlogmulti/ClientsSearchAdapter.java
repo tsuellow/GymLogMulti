@@ -4,10 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,7 +93,11 @@ public class ClientsSearchAdapter extends RecyclerView.Adapter<ClientsSearchAdap
         //now find the tvs in the viewholder and assign them the correct text
         viewHolder.mId.setText("ID: "+client.getId());
         viewHolder.mFirstName.setText(client.getFirstName());
-        viewHolder.mLastName.setText(client.getLastName());
+        if (ConstantsTest.IS_HIGH_SECURITY){
+            viewHolder.mLastName.setText(client.getLastName().substring(0,1)+".");
+        }else{
+            viewHolder.mLastName.setText(client.getLastName());
+        }
 
         String idPart = String.valueOf(client.getId());
         String imageFileName = "THUMB_" + idPart ;

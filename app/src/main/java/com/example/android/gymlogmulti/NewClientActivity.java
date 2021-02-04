@@ -16,16 +16,16 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Editable;
 import android.text.InputType;
@@ -241,7 +241,7 @@ public class NewClientActivity extends AppCompatActivity {
             final String qrText="{\"obj\":\"l\",\""+MainActivity.GYM_ID+"id\":"+mId.getText().toString()+"}";
             final File qrFile = createQrCodeFile();
 
-            final String displayName=mFirstName.getText().toString()+" "+mLastName.getText().toString()+" ID: "+mId.getText().toString();
+            final String displayName=mFirstName.getText().toString()+" "+mLastName.getText().toString().substring(0,1)+". ID: "+mId.getText().toString();
             final String mobileNumber=mPhone.getText().toString();
 
             AppExecutors.getInstance().diskIO().execute(new Runnable() {
@@ -266,7 +266,9 @@ public class NewClientActivity extends AppCompatActivity {
 
             //Toast.makeText(getApplicationContext(),""+mBase64.length()+" vs. "+colorTest.length(),Toast.LENGTH_LONG).show();
 
-            Intent i=new Intent(getApplicationContext(),SearchActivity.class);
+            Intent i = new Intent(this,ClientProfileActivity.class);
+            int id=Integer.parseInt(mId.getText().toString());
+            i.putExtra("CLIENT_ID",id);
             startActivity(i);
         }
 
@@ -339,8 +341,6 @@ public class NewClientActivity extends AppCompatActivity {
 
         boolean isInRange= ((idInt>=MainActivity.RANGE_FROM && idInt<=MainActivity.RANGE_TO)||idInt<0);
 
-
-
         if (isNew==1 && isInRange){
             ilId.setErrorEnabled(false);
             return  true;
@@ -383,7 +383,8 @@ public class NewClientActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode==REQUEST_TAKE_PHOTO && resultCode==RESULT_OK){
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             //setPic();
             takePic();
             setPicture();
@@ -465,7 +466,7 @@ public class NewClientActivity extends AppCompatActivity {
 
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
+                Uri photoURI = FileProvider.getUriForFile(getApplicationContext(),
                         getResources().getString(R.string.file_provider),
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);

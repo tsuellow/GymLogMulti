@@ -3,8 +3,10 @@ package com.example.android.gymlogmulti;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,12 +18,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.InputType;
 import android.util.Log;
@@ -74,6 +76,7 @@ public class ModifyClientActivity extends AppCompatActivity {
     int clientId;
 
     String mBase64;
+
 
 
     private GymDatabase mDb;
@@ -205,10 +208,20 @@ public class ModifyClientActivity extends AppCompatActivity {
 
             populateDb();
 
-            Intent i=new Intent(getApplicationContext(),SearchActivity.class);
-            startActivity(i);
+            getBackToProfile();
         }
 
+    }
+
+    private void getBackToProfile(){
+        Intent i = new Intent(ModifyClientActivity.this,ClientProfileActivity.class);
+        i.putExtra("CLIENT_ID",clientId);
+        startActivity(i);
+    }
+
+    @Override
+    public void onBackPressed() {
+        getBackToProfile();
     }
 
     //single conditions for evaluation
@@ -274,7 +287,8 @@ public class ModifyClientActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode==REQUEST_TAKE_PHOTO && resultCode==RESULT_OK){
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             //setPic();
             takePic();
             setPicture();

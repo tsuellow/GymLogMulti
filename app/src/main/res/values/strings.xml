@@ -269,6 +269,14 @@
     <string name="server_changed">server address has been changed successfully</string>
     <string name="error_server_change">an error has occurred, try again</string>
     <string name="wrong_admin_pin">wrong Admin PIN</string>
+    <string name="hide_thumbs">Hide thumbnails</string>
+    <string name="connect_door">Connect door</string>
+    <string name="door_settings">Door Settings</string>
+    <string name="connect_door_summary">Turn on when door is used</string>
+    <string name="door_proximity">Use proximity sensor</string>
+    <string name="door_proximity_summary">makes door close automatically on sensor input</string>
+    <string name="door_duration">Open duration in seconds</string>
+    <string name="door_duration_summary">Closes door when proximity sensor is not used</string>
 
 
 </resources>

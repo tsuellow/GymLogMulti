@@ -2,14 +2,16 @@ package com.example.android.gymlogmulti;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +31,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
 
 
+    SharedPreferences sharedPreferences;
+    boolean hideThumbs;
 
     //this defines the viewholder and finds and holds on to all its elements
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -57,6 +61,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     public SearchAdapter(Context context){
         //mClients=clients;
         mContext=context;
+        sharedPreferences= PreferenceManager.getDefaultSharedPreferences(context);
+        hideThumbs=sharedPreferences.getBoolean("hidethumbs",false);
     }
 
     //define method to get and set current data source. usefull when clicking on adapter item
@@ -90,7 +96,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
         //now find the tvs in the viewholder and assign them the correct text
         viewHolder.mFirstName.setText(client.getFirstName());
-        viewHolder.mLastName.setText(client.getLastName());
+        if (ConstantsTest.IS_HIGH_SECURITY){
+            viewHolder.mLastName.setText(client.getLastName().substring(0,1)+".");
+        }else{
+            viewHolder.mLastName.setText(client.getLastName());
+        }
         viewHolder.mIdSearch.setText("ID: "+client.getId());
 
         String idPart = String.valueOf(client.getId());
@@ -99,49 +109,56 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         final File thumbnail = new File(storageDir, imageFileName + ".jpg");
         final File medium = new File(storageDir, medFileName + ".jpg");
-        if (thumbnail.exists()) {
-            String thumb = thumbnail.getAbsolutePath();
-            Bitmap bitmap = BitmapFactory.decodeFile(thumb);
-            RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), bitmap);
-            roundedBitmapDrawable.setCircular(true);
-            viewHolder.mProfileImage.setImageDrawable(roundedBitmapDrawable);
-        }
-        else{
+
+        if (hideThumbs){
             viewHolder.mProfileImage.setImageResource(R.drawable.camera);
+        }else{
+            if (thumbnail.exists()) {
+                String thumb = thumbnail.getAbsolutePath();
+                Bitmap bitmap = BitmapFactory.decodeFile(thumb);
+                RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), bitmap);
+                roundedBitmapDrawable.setCircular(true);
+                viewHolder.mProfileImage.setImageDrawable(roundedBitmapDrawable);
+            }
+            else{
+                viewHolder.mProfileImage.setImageResource(R.drawable.camera);
+            }
         }
 
-        viewHolder.mOptionsMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PopupMenu popup=new PopupMenu(mContext,viewHolder.mOptionsMenu);
-                //inflate the created menu resource
-                popup.inflate(R.menu.mod_pay_options_menu);
-                //define what to do on each item click
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        switch (menuItem.getItemId()){
-                            case R.id.opt_modify:{
-                                //Toast.makeText(mContext,"you want to modify this profile",Toast.LENGTH_LONG).show();
-                                Intent i = new Intent(mContext,ModifyClientActivity.class);
-                                i.putExtra("CLIENT_ID",clientId);
-                                mContext.startActivity(i);
-                                break;
+        if (!ConstantsTest.IS_HIGH_SECURITY) {
+            viewHolder.mOptionsMenu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    PopupMenu popup = new PopupMenu(mContext, viewHolder.mOptionsMenu);
+                    //inflate the created menu resource
+                    popup.inflate(R.menu.mod_pay_options_menu);
+                    //define what to do on each item click
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem menuItem) {
+                            switch (menuItem.getItemId()) {
+                                case R.id.opt_modify: {
+                                    //Toast.makeText(mContext,"you want to modify this profile",Toast.LENGTH_LONG).show();
+                                    Intent i = new Intent(mContext, ModifyClientActivity.class);
+                                    i.putExtra("CLIENT_ID", clientId);
+                                    mContext.startActivity(i);
+                                    break;
+                                }
+                                case R.id.opt_pay: {
+                                    //Toast.makeText(mContext,"this guy wants to pay",Toast.LENGTH_LONG).show();
+                                    Intent i = new Intent(mContext, PayClientActivity.class);
+                                    i.putExtra("CLIENT_ID", clientId);
+                                    mContext.startActivity(i);
+                                    break;
+                                }
                             }
-                            case R.id.opt_pay:{
-                                //Toast.makeText(mContext,"this guy wants to pay",Toast.LENGTH_LONG).show();
-                                Intent i = new Intent(mContext,PayClientActivity.class);
-                                i.putExtra("CLIENT_ID",clientId);
-                                mContext.startActivity(i);
-                                break;
-                            }
+                            return false;
                         }
-                        return false;
-                    }
-                });
-                popup.show();
-            }
-        });
+                    });
+                    popup.show();
+                }
+            });
+        }
         //test
         viewHolder.mProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,7 +180,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             @Override
             public void onClick(View view) {
                 //Toast.makeText(mContext,"background clicked", Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(mContext,ClientProfileActivity.class);
+                Intent i = new Intent(mContext,LoginScreen.class);
+                i.putExtra("goal","view_client");
                 i.putExtra("CLIENT_ID",clientId);
                 mContext.startActivity(i);
             }

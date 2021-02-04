@@ -14,6 +14,12 @@
             android:defaultValue="false"
             android:key="manualsearch"/>
 
+        <SwitchPreference
+            android:title="@string/hide_thumbs"
+            android:defaultValue="false"
+            android:key="hidethumbs"/>
+
+
         <Preference
             android:title="@string/change_pin"
             android:defaultValue="1234"
@@ -34,6 +40,33 @@
         <Preference
             android:key="gymdata"
             android:title="@string/gym_data"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/door_settings">
+
+        <SwitchPreference
+            android:title="@string/connect_door"
+            android:defaultValue="false"
+            android:key="doorconnect" />
+
+        <SwitchPreference
+            android:title="@string/door_proximity"
+            android:defaultValue="true"
+            android:key="doorproximity"
+            android:enabled="false"
+            android:summary="@string/door_proximity_summary"/>
+
+        <EditTextPreference
+            android:title="@string/door_duration"
+            android:inputType="number"
+            android:enabled="false"
+            android:defaultValue="5"
+            android:key="doorduration"
+            android:summary="@string/door_duration_summary"/>
+
+
 
     </PreferenceCategory>
 

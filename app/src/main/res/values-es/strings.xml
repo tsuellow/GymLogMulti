@@ -222,4 +222,12 @@
     <string name="server_address">Dirección de servidor</string>
     <string name="server_changed">la dirección de servidor ha sido cambiada exitosamente</string>
     <string name="wrong_admin_pin">PIN de Admin incorrecto, contactá al admin de sistema</string>
+    <string name="hide_thumbs">Ocultar fotos miniatura</string>
+    <string name="connect_door">Conectar puerta</string>
+    <string name="door_settings">Ajustes de Puerta</string>
+    <string name="connect_door_summary">Conecta la app con una puerta de acceso</string>
+    <string name="door_proximity">Usar sensor de proximidad</string>
+    <string name="door_proximity_summary">Cierra la puerta automaticamente después del acceso</string>
+    <string name="door_duration">Tiempo de apertura en segundos</string>
+    <string name="door_duration_summary">define el tiempo de apertura cuando </string>
 </resources>
