@@ -46,6 +46,14 @@ android {
             applicationId "com.example.android.gymlogmulti.hypergym"
 
         }
+        absalonGym{
+            applicationId "com.example.android.gymlogmulti.absalongym"
+
+        }
+        unityFitness{
+            applicationId "com.example.android.gymlogmulti.unityfitness"
+
+        }
     }
 }
 

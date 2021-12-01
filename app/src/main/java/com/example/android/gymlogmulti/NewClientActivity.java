@@ -61,6 +61,7 @@ public class NewClientActivity extends AppCompatActivity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int MY_PERMISSIONS_REQUEST_WRITE_CONTACTS =2;
+    static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS =555;
     public static final int REQUEST_CODE = 10;
     EditText mId, mFirstName,mLastName,mPhone, mDob;
     AutoCompleteTextView mOccupation;
@@ -218,6 +219,8 @@ public class NewClientActivity extends AppCompatActivity {
 
             }
         }
+
+
     }
 
     @Override

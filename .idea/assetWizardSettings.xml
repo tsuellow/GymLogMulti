@@ -85,8 +85,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\theo\Desktop\GYMLOG_MASTER\generic\weightlift_launcher.png" />
-                                                <entry key="scalingPercent" value="46" />
+                                                <entry key="imagePath" value="C:\Users\theo\Desktop\GYMLOG_MASTER\UnityFitness\new_logo_small.png" />
+                                                <entry key="scalingPercent" value="58" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -119,6 +119,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
+                                      <entry key="backgroundColor" value="000000" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -211,7 +212,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\theo\Desktop\GYMLOG_MASTER\generic\weightlift_launcher.png" />
+                                                <entry key="imagePath" value="C:\Users\theo\Desktop\GYMLOG_MASTER\UnityFitness\new_logo_small.png" />
                                                 <entry key="paddingPercent" value="5" />
                                               </map>
                                             </option>
@@ -245,7 +246,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="C:\Users\theo\Desktop\GYMLOG_MASTER\generic\weightlift_launcher.png" />
+                                      <entry key="imageAsset" value="C:\Users\theo\Desktop\GYMLOG_MASTER\UnityFitness\new_logo_small.png" />
                                       <entry key="outputName" value="notify_icon" />
                                     </map>
                                   </option>
@@ -327,11 +328,6 @@
                                 </PersistentState>
                               </value>
                             </entry>
-                          </map>
-                        </option>
-                        <option name="values">
-                          <map>
-                            <entry key="outputIconType" value="NOTIFICATION" />
                           </map>
                         </option>
                       </PersistentState>

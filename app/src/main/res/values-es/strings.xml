@@ -230,4 +230,9 @@
     <string name="door_proximity_summary">Cierra la puerta automaticamente después del acceso</string>
     <string name="door_duration">Tiempo de apertura en segundos</string>
     <string name="door_duration_summary">define el tiempo de apertura cuando </string>
+    <string name="send_receipt">send receipt</string>
+    <string name="client">Cliente:</string>
+
+    <string name="external">externo</string>
+
 </resources>

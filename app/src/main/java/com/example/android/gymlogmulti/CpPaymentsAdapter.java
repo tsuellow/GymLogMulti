@@ -5,6 +5,11 @@ import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +20,14 @@ import android.widget.TextView;
 import com.example.android.gymlogmulti.data.DateConverter;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.data.PaymentEntry;
+import com.example.android.gymlogmulti.utils.MiscellaneousUtils;
+import com.example.android.gymlogmulti.utils.PhoneUtilities;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.ViewHolder> {
 
@@ -26,7 +35,7 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
     //this defines the viewholder and finds and holds on to all its elements
     public class ViewHolder extends RecyclerView.ViewHolder{
         private TextView mFrom, mUntil, mProduct, mAmount;
-        private Button mDelete;
+        private Button mDelete, mSendReceipt;
         private LinearLayout mBackground;
 
         public ViewHolder(View itemView){
@@ -38,15 +47,24 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
             mProduct = (TextView) itemView.findViewById(R.id.tv_product_cp_pay);
             mAmount=(TextView) itemView.findViewById(R.id.tv_amount_cp_pay);
             mDelete=(Button) itemView.findViewById(R.id.bt_delete_cp_pay);
+            mSendReceipt=(Button) itemView.findViewById(R.id.bt_send_receipt_cp_pay);
         }
     }
 
     private List<PaymentEntry> mPayments;
     private Context mContext;
     private GymDatabase mDb;
+    String phone;
+    String fullName;
     public CpPaymentsAdapter(Context context, GymDatabase database){
         mDb=database;
         mContext=context;
+
+    }
+
+    public void setAdditionalData(String phone, String fullName){
+        this.phone=phone;
+        this.fullName=fullName;
     }
 
     //define method to get and set current data source. usefull when clicking on adapter item
@@ -151,6 +169,27 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
             }
         });
 
+        viewHolder.mSendReceipt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String text=mContext.getString(R.string.client)+" *"+fullName+"* \n\n";
+                String dialogText=mContext.getString(R.string.payment_id)+" _"+payment.getId()+ "_ \n"+
+                        mContext.getString(R.string.paid_at)+" _"+DateConverter.getDateString(payment.getTimestamp()).substring(0,16)+ "_ \n"+
+                        mContext.getString(R.string.branch)+" _"+payment.getBranch()+ "_ \n"+
+                        mContext.getString(R.string.amount)+" _"+amount+"_ \n"+
+                        mContext.getString(R.string.currency_cap)+" _"+payment.getCurrency()+"_ \n"+
+                        mContext.getString(R.string.product_cap)+" _"+payment.getProduct()+"_ \n"+
+                        mContext.getString(R.string.from_cap)+" _"+DateConverter.getDateString(payment.getPaidFrom()).substring(0,16)+ "_ \n"+
+                        mContext.getString(R.string.to_cap)+" _"+DateConverter.getDateString(payment.getPaidUntil()).substring(0,16)+ "_ \n"+
+                        mContext.getString(R.string.days_of_week)+" _"+(payment.getDayOfWeek()!=null?payment.getDayOfWeek().replace("1",mContext.getString(R.string.sun))
+                        .replace("2",mContext.getString(R.string.mon)).replace("3",mContext.getString(R.string.tue)).replace("4",mContext.getString(R.string.wed))
+                        .replace("5",mContext.getString(R.string.thu)).replace("6",mContext.getString(R.string.fri)).replace("7",mContext.getString(R.string.sat)):"-").trim()+ "_ \n"+
+                        mContext.getString(R.string.comment_cap)+" _"+payment.getComment()+"_ ";
+                text=text+dialogText;
+                sendReceipt(text);
+            }
+        });
+
     }
 
     @Override
@@ -173,5 +212,13 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
                 mDb.paymentDao().updatePayment(payment);
             }
         });
+    }
+
+    private void sendReceipt(String text){
+        Uri uri =Uri.parse(MiscellaneousUtils.saveStandardFile(mContext).getAbsolutePath());
+        Log.d("wtf", Objects.requireNonNull(uri.getPath()));
+        MiscellaneousUtils.sendImageAndTextOnWs(mContext,phone,uri,text);
+
+
     }
 }

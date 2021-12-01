@@ -429,6 +429,7 @@ public class DataBackup {
                         try {
                             String res = response.getString("response");
                             if (res.equals("OK")) {
+                                Log.d("belloy",response.getJSONArray("client").get(0).toString());
                                 GymDatabase mDb=GymDatabase.getInstance(mContext);
                                 JSONArray jsonClientArray=response.getJSONArray("client");
                                 JSONArray jsonPaymentArray=response.getJSONArray("payment");
@@ -618,7 +619,7 @@ public class DataBackup {
                 }catch (Exception e){
                     Log.d("gymlog_failed_restore","inserting client "+id+" failed. please investigate");
                 }
-                if (!photo.contentEquals("") || !photo.isEmpty()) {
+                if (!photo.contentEquals("") && !photo.isEmpty() && photo!=null) {
                     PhotoUtils.createGrayScaleThumb(id, photo, mContext);
                 }
 

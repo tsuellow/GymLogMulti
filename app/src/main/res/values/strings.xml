@@ -277,6 +277,8 @@
     <string name="door_proximity_summary">makes door close automatically on sensor input</string>
     <string name="door_duration">Open duration in seconds</string>
     <string name="door_duration_summary">Closes door when proximity sensor is not used</string>
+    <string name="send_receipt">send receipt</string>
+    <string name="client">Client:</string>
 
 
 </resources>

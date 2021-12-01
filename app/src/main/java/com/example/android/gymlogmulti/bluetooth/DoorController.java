@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.android.gymlogmulti.MainActivity;
+import com.example.android.gymlogmulti.R;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,6 +117,7 @@ public class DoorController {
                 @Override
                 public void run() {
                     Toast.makeText(mContext,"successfully connected to door",Toast.LENGTH_LONG).show();
+                    ((MainActivity)mContext).setDoorConnected(R.color.colorAccent);
                 }
             });
 
@@ -191,6 +193,13 @@ public class DoorController {
                     mmOutStream.write(bytes);
                 } catch (IOException e) {
                     Log.e(TAG, "Error occurred when sending data", e);
+                    ((MainActivity)mContext).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(mContext,"connection lost",Toast.LENGTH_LONG).show();
+                            ((MainActivity)mContext).setDoorConnected(R.color.colorWhite);
+                        }
+                    });
 
                 }
             }else{
@@ -198,6 +207,7 @@ public class DoorController {
                     @Override
                     public void run() {
                         Toast.makeText(mContext,"connection lost",Toast.LENGTH_LONG).show();
+                        ((MainActivity)mContext).setDoorConnected(R.color.colorWhite);
                     }
                 });
             }

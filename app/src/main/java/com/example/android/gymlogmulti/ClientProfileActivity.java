@@ -28,6 +28,7 @@ import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.data.PaymentEntry;
 import com.example.android.gymlogmulti.data.VisitEntry;
 import com.example.android.gymlogmulti.utils.DateMethods;
+import com.example.android.gymlogmulti.utils.MiscellaneousUtils;
 import com.example.android.gymlogmulti.utils.PhoneUtilities;
 import com.example.android.gymlogmulti.utils.PhotoUtils;
 import com.example.android.gymlogmulti.utils.QrCodeUtilities;
@@ -63,6 +64,7 @@ public class ClientProfileActivity extends AppCompatActivity {
     int clientId;
     String phoneNr=null;
     String firstName="";
+    String contactName="";
     //SearchAdapter mAdapter;
 
 
@@ -97,14 +99,9 @@ public class ClientProfileActivity extends AppCompatActivity {
         mContext=getApplicationContext();
         mDb = GymDatabase.getInstance(getApplicationContext());
 
-        //mAdapter = new SearchAdapter(this);
-        mPaymentsAdapter=new CpPaymentsAdapter(this,mDb);
-        mVisitsAdapter= new CpVisitsAdapter(this);
-        rvVisits.setAdapter(mVisitsAdapter);
-        rvPayments.setAdapter(mPaymentsAdapter);
 
-        rvPayments.setLayoutManager(new LinearLayoutManager(this));
-        rvVisits.setLayoutManager(new LinearLayoutManager(this));
+
+
 
         Intent i=getIntent();
         clientId=i.getExtras().getInt("CLIENT_ID");
@@ -112,6 +109,14 @@ public class ClientProfileActivity extends AppCompatActivity {
         retrieveData(clientId);
         retrieveDataPayments(clientId);
         retrieveDataVisits(clientId);
+
+        //mAdapter = new SearchAdapter(this);
+        mPaymentsAdapter=new CpPaymentsAdapter(this,mDb);
+        mVisitsAdapter= new CpVisitsAdapter(this);
+        rvVisits.setAdapter(mVisitsAdapter);
+        rvPayments.setAdapter(mPaymentsAdapter);
+        rvPayments.setLayoutManager(new LinearLayoutManager(this));
+        rvVisits.setLayoutManager(new LinearLayoutManager(this));
 
         mPhone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,6 +157,7 @@ public class ClientProfileActivity extends AppCompatActivity {
                 if (qrFile.exists()) {
                     if (phoneNr != null) {
                         shareQrOnWhatsApp(phoneNr);
+
                         //openWhatsApp2("00505"+phoneNr);
                     } else {
                         Toast.makeText(mContext, R.string.need_phone, Toast.LENGTH_LONG).show();
@@ -178,6 +184,7 @@ public class ClientProfileActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
 
 
     }
@@ -219,7 +226,7 @@ public class ClientProfileActivity extends AppCompatActivity {
                 //now set all vars
                 mId.setText("ID: "+clientEntry.getId());
                 mFirstName.setText(clientEntry.getFirstName());
-                mLastName.setText(clientEntry.getLastName().substring(0,Math.min(10,clientEntry.getLastName().length()))+"...");
+                mLastName.setText(clientEntry.getLastName());
                 firstName=clientEntry.getFirstName();
 
                 //dob string
@@ -246,6 +253,16 @@ public class ClientProfileActivity extends AppCompatActivity {
 
                 //set photo
                 PhotoUtils.getAppropriateBitmapRounded(clientEntry.getId(),mContext,mProfilePhoto);
+
+                mPaymentsAdapter.setAdditionalData(clientEntry.getPhone(),clientEntry.getFirstName()+" "+clientEntry.getLastName());
+
+
+                if (!MiscellaneousUtils.contactExists(mContext,phoneNr)){
+                    boolean res=MiscellaneousUtils.addContact(clientEntry.getFirstName()+" "+clientEntry.getLastName().substring(0,1)+".",clientEntry.getPhone(),mContext);
+                    if (res){
+                        Toast.makeText(mContext,"client added to contacts",Toast.LENGTH_LONG).show();
+                    }
+                }
 
             }
         });

@@ -180,9 +180,16 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             @Override
             public void onClick(View view) {
                 //Toast.makeText(mContext,"background clicked", Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(mContext,LoginScreen.class);
-                i.putExtra("goal","view_client");
-                i.putExtra("CLIENT_ID",clientId);
+                Intent i;
+                if (ConstantsTest.IS_HIGH_SECURITY){
+                    i= new Intent(mContext,LoginScreen.class);
+                    i.putExtra("goal","view_client");
+                    i.putExtra("CLIENT_ID",clientId);
+                }else{
+                    i= new Intent(mContext,ClientProfileActivity.class);
+                    i.putExtra("CLIENT_ID",clientId);
+                }
+
                 mContext.startActivity(i);
             }
         });

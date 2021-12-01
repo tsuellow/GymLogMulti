@@ -1,22 +1,31 @@
 package com.example.android.gymlogmulti;
 
+import android.Manifest;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import androidx.annotation.Nullable;
@@ -54,6 +63,9 @@ import com.journeyapps.barcodescanner.camera.CameraSettings;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -76,6 +88,7 @@ public class MainActivity extends AppCompatActivity{
 
 
     public static final String CHANNEL_ID="111";
+    public static  final int MY_PERMISSIONS_REQUEST_READ_CONTACTS=555;
     private Button mManualSearch;
     private Context mContext;
     private GymDatabase mDb;
@@ -195,6 +208,23 @@ public class MainActivity extends AppCompatActivity{
         //bluetooth test
         doorController=new DoorController(this);
         doorController.initializeBluetooth();
+
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.READ_CONTACTS)) {
+
+            } else {
+
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.READ_CONTACTS},
+                        MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+
+            }
+        }
     }
 
     //flashlight method
@@ -219,6 +249,10 @@ public class MainActivity extends AppCompatActivity{
         colorAnimText.setDuration(1000);
         colorAnimText.setEvaluator(new ArgbEvaluator());
         colorAnimText.start();
+    }
+
+    public void setDoorConnected(int color){
+        mDoor.setColorFilter(ContextCompat.getColor(mContext,color));
     }
 
 
@@ -599,6 +633,8 @@ public class MainActivity extends AppCompatActivity{
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+
 
 
 

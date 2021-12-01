@@ -30,7 +30,6 @@
         <activity
             android:name="com.example.android.gymlogmulti.MainActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
-            android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,7 +50,6 @@
         <activity
             android:name="com.example.android.gymlogmulti.SearchActivity"
             android:label="@string/title_activity_search"
-            android:launchMode="singleTask"
             android:parentActivityName="com.example.android.gymlogmulti.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
