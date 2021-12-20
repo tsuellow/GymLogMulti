@@ -8,11 +8,12 @@ import androidx.room.PrimaryKey;
 import androidx.annotation.NonNull;
 
 import com.example.android.gymlogmulti.MainActivity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Date;
 
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity(tableName = "payment", foreignKeys = @ForeignKey(entity = ClientEntry.class,
         parentColumns = "id",
         childColumns = "clientId",

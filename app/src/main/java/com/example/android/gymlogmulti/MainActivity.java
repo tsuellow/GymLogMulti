@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity{
     SharedPreferences sharedPreferences;
 
     DoorController doorController;
+    WebSocketConn webSocketConn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,9 +206,15 @@ public class MainActivity extends AppCompatActivity{
 
         createNotificationChannel();
         resetAlarm();
+        //websocket test
+        webSocketConn=new WebSocketConn("http://192.168.1.104:81",Constants.GYM_BRANCH,this);
+        webSocketConn.openSocket();
         //bluetooth test
         doorController=new DoorController(this);
         doorController.initializeBluetooth();
+
+
+
 
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.READ_CONTACTS)

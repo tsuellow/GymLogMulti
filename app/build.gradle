@@ -1,11 +1,12 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "com.example.android.gymlogmulti"
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName '1.1'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -102,4 +103,17 @@ dependencies {
     implementation 'com.github.aakira:expandable-layout:1.6.0@aar'
     //excel export
     implementation 'com.opencsv:opencsv:4.5'
+    implementation "androidx.core:core-ktx:1.7.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    implementation ('io.socket:socket.io-client:2.0.1') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
+    //json to java object
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.10.0"
+}
+repositories {
+    mavenCentral()
 }
