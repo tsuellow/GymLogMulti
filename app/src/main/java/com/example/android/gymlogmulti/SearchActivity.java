@@ -99,8 +99,10 @@ public class SearchActivity extends AppCompatActivity {
         packageManager = this.getPackageManager();
     }
 
+
     @Override
     public void onBackPressed() {
+
         Intent i = new Intent(SearchActivity.this, MainActivity.class);
         startActivity(i);;
     }
@@ -211,6 +213,10 @@ public class SearchActivity extends AppCompatActivity {
                     }
                 });
 
+                break;
+            }
+            case  android.R.id.home:{
+                onBackPressed();
                 break;
             }
 

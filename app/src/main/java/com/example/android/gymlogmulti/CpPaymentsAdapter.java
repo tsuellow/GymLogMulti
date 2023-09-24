@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -172,6 +173,7 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
         viewHolder.mSendReceipt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String title="*"+mContext.getString(R.string.sendtitle)+"* \n\n";
                 String text=mContext.getString(R.string.client)+" *"+fullName+"* \n\n";
                 String dialogText=mContext.getString(R.string.payment_id)+" _"+payment.getId()+ "_ \n"+
                         mContext.getString(R.string.paid_at)+" _"+DateConverter.getDateString(payment.getTimestamp()).substring(0,16)+ "_ \n"+
@@ -185,7 +187,7 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
                         .replace("2",mContext.getString(R.string.mon)).replace("3",mContext.getString(R.string.tue)).replace("4",mContext.getString(R.string.wed))
                         .replace("5",mContext.getString(R.string.thu)).replace("6",mContext.getString(R.string.fri)).replace("7",mContext.getString(R.string.sat)):"-").trim()+ "_ \n"+
                         mContext.getString(R.string.comment_cap)+" _"+payment.getComment()+"_ ";
-                text=text+dialogText;
+                text=title+text+dialogText;
                 sendReceipt(text);
             }
         });
@@ -217,7 +219,12 @@ public class CpPaymentsAdapter extends RecyclerView.Adapter<CpPaymentsAdapter.Vi
     private void sendReceipt(String text){
         Uri uri =Uri.parse(MiscellaneousUtils.saveStandardFile(mContext).getAbsolutePath());
         Log.d("wtf", Objects.requireNonNull(uri.getPath()));
-        MiscellaneousUtils.sendImageAndTextOnWs(mContext,phone,uri,text);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            MiscellaneousUtils.sendTextOnWs(mContext,phone,text);
+        }else{
+            MiscellaneousUtils.sendImageAndTextOnWs(mContext,phone,uri,text);
+        }
+
 
 
     }

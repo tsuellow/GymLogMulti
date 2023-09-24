@@ -18,6 +18,8 @@ import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.android.gymlogmulti.utils.MiscellaneousUtils;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -71,6 +73,7 @@ public class NewClientActivity extends AppCompatActivity {
 
     ImageView mPhoto;
     Button mTakePic;
+    Button mGenerate;
     Button mSubmit;
     DatePickerDialog.OnDateSetListener onDateSetListener;
     Date dateOfBirth=null;
@@ -156,6 +159,7 @@ public class NewClientActivity extends AppCompatActivity {
 
         mPhoto=(ImageView) findViewById(R.id.iv_photo);
         mTakePic=(Button) findViewById(R.id.bt_take_photo);
+        mGenerate=(Button) findViewById(R.id.bt_generate);
         mSubmit=(Button) findViewById(R.id.bt_submit);
         mDb=GymDatabase.getInstance(getApplicationContext());
 
@@ -168,6 +172,25 @@ public class NewClientActivity extends AppCompatActivity {
                 cal.set(2000,0,1);
                 Date defaultDate=cal.getTime();
                 displayDatePickerDialog(defaultDate);
+            }
+        });
+
+        mGenerate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        int id=mDb.clientDao().autogenerateId();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mId.setText(String.valueOf(id));
+                            }
+                        });
+                    }
+                });
+
             }
         });
 
@@ -242,7 +265,7 @@ public class NewClientActivity extends AppCompatActivity {
             final Context context=getApplicationContext();
 
             final String qrText="{\"obj\":\"l\",\""+MainActivity.GYM_ID+"id\":"+mId.getText().toString()+"}";
-            final File qrFile = createQrCodeFile();
+            //final File qrFile = createQrCodeFile();
 
             final String displayName=mFirstName.getText().toString()+" "+mLastName.getText().toString().substring(0,1)+". ID: "+mId.getText().toString();
             final String mobileNumber=mPhone.getText().toString();
@@ -250,7 +273,7 @@ public class NewClientActivity extends AppCompatActivity {
             AppExecutors.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
-                    saveQrCode(qrText,qrFile,context);
+                    QrCodeUtilities.saveQrCodeNew(Integer.parseInt(mId.getText().toString()),context);
                     String contactsToast;
                     if(addContact(displayName,mobileNumber,context)){
                         contactsToast=getString(R.string.added_to_contacts);
@@ -429,15 +452,15 @@ public class NewClientActivity extends AppCompatActivity {
 
         return image;
     }
-    private File createQrCodeFile()  {
-        // Create an image file name
-        String idPart = mId.getText().toString();//new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "QR_CODE_" + idPart ;
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File qrCode = new File(storageDir, imageFileName + ".jpg");
-        // Save a file: path for use with ACTION_VIEW intents
-        return qrCode;
-    }
+//    private File createQrCodeFile()  {
+//        // Create an image file name
+//        String idPart = mId.getText().toString();//new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//        String imageFileName = "QR_CODE_" + idPart ;
+////        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        File qrCode = MiscellaneousUtils.getSharedImageFile(imageFileName,this);
+//        // Save a file: path for use with ACTION_VIEW intents
+//        return qrCode;
+//    }
     private File createMediumFile()  {
         // Create an image file name
         String idPart = mId.getText().toString();//new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -485,7 +508,7 @@ public class NewClientActivity extends AppCompatActivity {
 
     //code to frame and display pic
     private void takePic(){
-        Bitmap bitmap = BitmapFactory.decodeFile(createImageFile().getAbsolutePath());
+        Bitmap bitmap = MiscellaneousUtils.rectifyImage(this, createImageFile());
         int width  = bitmap.getWidth();
         int height = bitmap.getHeight();
         int newWidth = (height > width) ? width : height;
@@ -495,9 +518,9 @@ public class NewClientActivity extends AppCompatActivity {
         int cropH = (height - width) / 2;
         cropH = (cropH < 0)? 0: cropH;
         Bitmap cropImg = Bitmap.createBitmap(bitmap, cropW, cropH, newWidth, newHeight);
-        if (Constants.USER_NAME=="CosmosGym"){
-            cropImg=rotateImage(cropImg,270);
-        }
+//        if (Constants.USER_NAME=="CosmosGym"){
+//            cropImg=rotateImage(cropImg,270);
+//        }
         savePhotoThumbMed(cropImg);
         if (createImageFile().exists()){
             createImageFile().delete();
@@ -527,7 +550,7 @@ public class NewClientActivity extends AppCompatActivity {
 
 
 
-    private void savePhotoThumbMed(final Bitmap bitmap) {
+    private  void savePhotoThumbMed(final Bitmap bitmap) {
         try {
             File thumbFile = createThumbnailFile();
             File mediumFile = createMediumFile();
@@ -582,7 +605,7 @@ public class NewClientActivity extends AppCompatActivity {
         }
     }
 
-    private boolean addContact(String DisplayName,String MobileNumber, Context context)
+    public static boolean addContact(String DisplayName,String MobileNumber, Context context)
     {
 
         MobileNumber = MobileNumber.replace(" ", "");

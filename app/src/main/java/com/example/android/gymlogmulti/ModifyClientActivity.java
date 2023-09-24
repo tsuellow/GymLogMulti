@@ -20,6 +20,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.android.gymlogmulti.utils.MiscellaneousUtils;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AlertDialog;
@@ -202,8 +204,10 @@ public class ModifyClientActivity extends AppCompatActivity {
             AppExecutors.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
-                    saveQrCode(qrText,qrFile,context);
+                    QrCodeUtilities.saveQrCodeNew(clientId,context);
+                    Log.d("saveQR","was resaved");
                 }
+
             });
 
             populateDb();
@@ -392,7 +396,7 @@ public class ModifyClientActivity extends AppCompatActivity {
 
     //code to frame and display pic
     private void takePic(){
-        Bitmap bitmap = BitmapFactory.decodeFile(createImageFile().getAbsolutePath());
+        Bitmap bitmap = MiscellaneousUtils.rectifyImage(this, createImageFile());
         int width  = bitmap.getWidth();
         int height = bitmap.getHeight();
         int newWidth = (height > width) ? width : height;
@@ -402,9 +406,9 @@ public class ModifyClientActivity extends AppCompatActivity {
         int cropH = (height - width) / 2;
         cropH = (cropH < 0)? 0: cropH;
         Bitmap cropImg = Bitmap.createBitmap(bitmap, cropW, cropH, newWidth, newHeight);
-        if (Constants.USER_NAME=="CosmosGym"){
-            cropImg=rotateImage(cropImg,270);
-        }
+//        if (Constants.USER_NAME=="CosmosGym"){
+//            cropImg=rotateImage(cropImg,270);
+//        }
         savePhotoThumbMed(cropImg);
         if (createImageFile().exists()){
             createImageFile().delete();
@@ -521,24 +525,24 @@ public class ModifyClientActivity extends AppCompatActivity {
         }
     }
 
-    private void saveQrCode(String qrText, File qrFile, Context context){
-        try {
-
-            if (qrFile.exists()){
-                qrFile.delete();
-            }
-            FileOutputStream qrOut = new FileOutputStream(qrFile);
-            //String qrText="{\"obj\":\"l\",\""+MainActivity.GYM_ID+"id\":"+mId.getText().toString()+"}";
-            Bitmap qrCode= QrCodeUtilities.GenerateQrCode(context,qrText);
-            qrCode.compress(Bitmap.CompressFormat.JPEG, 100, qrOut);
-            qrOut.flush();
-            qrOut.close();
-            Log.d("QR saved", "QR ok");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            Log.d("QR saved", "QR IOException");
-        }
-    }
+//    private static void saveQrCode(String qrText, File qrFile, Context context){
+//        try {
+//
+//            if (qrFile.exists()){
+//                qrFile.delete();
+//            }
+//            FileOutputStream qrOut = new FileOutputStream(qrFile);
+//            //String qrText="{\"obj\":\"l\",\""+MainActivity.GYM_ID+"id\":"+mId.getText().toString()+"}";
+//            Bitmap qrCode= QrCodeUtilities.GenerateQrCode(context,qrText);
+//            qrCode.compress(Bitmap.CompressFormat.JPEG, 100, qrOut);
+//            qrOut.flush();
+//            qrOut.close();
+//            Log.d("QR saved", "QR ok");
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//            Log.d("QR saved", "QR IOException");
+//        }
+//    }
 
     private void displayDatePickerDialog(Date date){
         AlertDialog.Builder mBuilder=new AlertDialog.Builder(ModifyClientActivity.this);

@@ -85,8 +85,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\theo\Desktop\GYMLOG_MASTER\UnityFitness\new_logo_small.png" />
-                                                <entry key="scalingPercent" value="58" />
+                                                <entry key="imagePath" value="C:\Users\theo\Desktop\GYMLOG_MASTER\ImpactusMatagalpa\app.png" />
+                                                <entry key="scalingPercent" value="67" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -119,7 +119,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="000000" />
+                                      <entry key="backgroundColor" value="efc105" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -212,7 +212,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\theo\Desktop\GYMLOG_MASTER\UnityFitness\new_logo_small.png" />
+                                                <entry key="imagePath" value="C:\Users\theo\Desktop\GYMLOG_MASTER\ImpactusMatagalpa\app.png" />
                                                 <entry key="paddingPercent" value="5" />
                                               </map>
                                             </option>
@@ -246,7 +246,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="C:\Users\theo\Desktop\GYMLOG_MASTER\UnityFitness\new_logo_small.png" />
+                                      <entry key="imageAsset" value="C:\Users\theo\Desktop\GYMLOG_MASTER\ImpactusMatagalpa\app.png" />
                                       <entry key="outputName" value="notify_icon" />
                                     </map>
                                   </option>

@@ -1,10 +1,10 @@
 package com.example.android.gymlogmulti;
 
 public class Constants {
-    public static final int qrDims=216;
+    public static final int qrDims=168;
     public static final boolean customProducts=true;
 
-    public static final String GYM_ID="w0";
+    public static final String GYM_ID="t1";
     public static final String USER_NAME="UnityFitness";
     public static final String GYM_BRANCH="ESTELI";
     public static final String COMPANY_NAME="Unity Fitness";

@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">GymLogMulti</string>
-    <string name="app_label" translatable="false">GymLog</string>
+    <string name="app_label" translatable="false">AbsalonGym</string>
     <string name="file_provider" translatable="false">com.example.android.fileprovider_gymlogmulti_absalongym</string>
 
 </resources>

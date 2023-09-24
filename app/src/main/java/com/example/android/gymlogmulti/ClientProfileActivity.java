@@ -17,6 +17,8 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -34,6 +36,7 @@ import com.example.android.gymlogmulti.utils.PhotoUtils;
 import com.example.android.gymlogmulti.utils.QrCodeUtilities;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -65,6 +68,7 @@ public class ClientProfileActivity extends AppCompatActivity {
     String phoneNr=null;
     String firstName="";
     String contactName="";
+    ClientEntry mClientEntry;
     //SearchAdapter mAdapter;
 
 
@@ -131,20 +135,19 @@ public class ClientProfileActivity extends AppCompatActivity {
             }
         });
 
-        final File qrFile= QrCodeUtilities.createQrCodeFile(clientId,mContext);
-        if (!qrFile.exists()) {
+//        final File qrFile= QrCodeUtilities.createQrCodeFile(clientId,mContext);
+        if (QrCodeUtilities.getQrUri(clientId,mContext)==null) {
             mQrCode.setColorFilter(getResources().getColor(android.R.color.tab_indicator_text));
             AppExecutors.getInstance().diskIO().execute(new Runnable() {
                 @Override
                 public void run() {
-                    QrCodeUtilities.saveQrCode(clientId,qrFile,mContext);
+                    QrCodeUtilities.saveQrCodeNew(clientId,mContext);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             mQrCode.setColorFilter(getResources().getColor(R.color.colorAccent));
                         }
                     });
-
                 }
             });
         }
@@ -154,16 +157,39 @@ public class ClientProfileActivity extends AppCompatActivity {
         mQrCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (qrFile.exists()) {
+                if (QrCodeUtilities.getQrUri(clientId,mContext)!=null) {
                     if (phoneNr != null) {
-                        shareQrOnWhatsApp(phoneNr);
+                        QrCodeUtilities.shareFileOnWhatsApp(mClientEntry,mContext);
 
                         //openWhatsApp2("00505"+phoneNr);
                     } else {
                         Toast.makeText(mContext, R.string.need_phone, Toast.LENGTH_LONG).show();
                     }
+                }else{
+                    Log.d("quepaso", "file inexistent");
                 }
 
+            }
+        });
+
+        mQrCode.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                String idPart = String.valueOf(clientId);
+                String qrFileName = "QR_CODE_" + idPart ;
+                //File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//                File qrCode = MiscellaneousUtils.getSharedImageFile(qrFileName,mContext);//new File(storageDir, qrFileName + ".jpg");
+//                Log.d("quepaso",qrCode.getAbsolutePath());
+                Uri qrUri = QrCodeUtilities.getQrUri(clientId,mContext);
+                if (qrUri!=null){
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setDataAndType(qrUri, "image/*");
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(mContext,"uri for file not found",Toast.LENGTH_LONG).show();
+                }
+                return true;
             }
         });
 
@@ -224,6 +250,7 @@ public class ClientProfileActivity extends AppCompatActivity {
             public void onChanged(@Nullable ClientEntry clientEntry) {
                 client.removeObserver(this);
                 //now set all vars
+                mClientEntry=clientEntry;
                 mId.setText("ID: "+clientEntry.getId());
                 mFirstName.setText(clientEntry.getFirstName());
                 mLastName.setText(clientEntry.getLastName());
@@ -284,27 +311,29 @@ public class ClientProfileActivity extends AppCompatActivity {
         }
     }
 
-    public void shareQrOnWhatsApp(String phone) {
-        String toNumber= PhoneUtilities.depuratePhone(phone);
-        toNumber=toNumber.replaceFirst("^0+(?!$)", "");
-        String idPart = String.valueOf(clientId);
-        String qrFileName = "QR_CODE_" + idPart ;
-        File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File qrCode = new File(storageDir, qrFileName + ".jpg");
-        Uri qrUri = Uri.parse(qrCode.getAbsolutePath());
-
-        Intent sendIntent = new Intent("android.intent.action.SEND");
-
-        //sendIntent.setComponent(new ComponentName("com.whatsapp","com.whatsapp.ContactPicker"));
-        sendIntent.setPackage("com.whatsapp");
-        sendIntent.setType("image/jpeg");
-        sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        sendIntent.putExtra(Intent.EXTRA_STREAM,qrUri);
-        sendIntent.putExtra("jid", ""+toNumber+"@s.whatsapp.net");
-        sendIntent.putExtra(Intent.EXTRA_TEXT,getString(R.string.hi)+" "+
-                firstName+", "+sharedPreferences.getString("gymname",getString(R.string.your_gym))+" "+getString(R.string.welcome_whatsapp_qr_code)+clientId+getString(R.string.asterisc_to_bolden_whatsapp));
-        startActivity(sendIntent);
-    }
+//    public void shareQrOnWhatsApp(String phone)  {
+//        String toNumber= PhoneUtilities.depuratePhone(phone);
+//        toNumber=toNumber.replaceFirst("^0+(?!$)", "");
+//        String idPart = String.valueOf(clientId);
+//        String qrFileName = "QR_CODE_" + idPart ;
+////        File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+////        Log.d("quepaso", storageDir.getAbsolutePath());
+//        File qrCode = MiscellaneousUtils.getSharedImageFile(qrFileName,mContext);//new File(storageDir, qrFileName + ".jpg");
+//        Log.d("quepaso", qrCode.getAbsolutePath());
+//        Uri qrUri = Uri.parse(qrCode.getAbsolutePath());
+//
+//        Intent sendIntent = new Intent("android.intent.action.SEND");
+//
+//        //sendIntent.setComponent(new ComponentName("com.whatsapp","com.whatsapp.ContactPicker"));
+//        sendIntent.setPackage("com.whatsapp");
+//        sendIntent.setType("image/jpeg");
+//        sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//        sendIntent.putExtra(Intent.EXTRA_STREAM,qrUri);
+//        sendIntent.putExtra("jid", ""+toNumber+"@s.whatsapp.net");
+//        sendIntent.putExtra(Intent.EXTRA_TEXT,getString(R.string.hi)+" "+
+//                firstName+", "+sharedPreferences.getString("gymname",getString(R.string.your_gym))+" "+getString(R.string.welcome_whatsapp_qr_code)+clientId+getString(R.string.asterisc_to_bolden_whatsapp));
+//        startActivity(sendIntent);
+//    }
 
     @Override
     public void onBackPressed() {

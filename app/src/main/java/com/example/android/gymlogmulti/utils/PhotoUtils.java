@@ -11,6 +11,7 @@ import android.os.Environment;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.example.android.gymlogmulti.R;
@@ -114,6 +115,34 @@ public class PhotoUtils {
             }
         }
 
+    }
+
+    public static String saveAndGenerateBase64(final Bitmap bitmap, int id, Context context) {
+        try {
+            File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            File thumbFile = new File(storageDir, "THUMB_" + id + ".jpg");
+            File mediumFile = new File(storageDir, "MEDIUM_" + id + ".jpg");
+            if (thumbFile.exists()){
+                thumbFile.delete();
+            }
+            if (mediumFile.exists()){
+                mediumFile.delete();
+            }
+            FileOutputStream thumbOut = new FileOutputStream(thumbFile);
+            FileOutputStream mediumOut = new FileOutputStream(mediumFile);
+            Bitmap thumb = Bitmap.createScaledBitmap(bitmap, 96, 96, false);
+            Bitmap medium = Bitmap.createScaledBitmap(bitmap, 1000, 1000, false);
+            thumb.compress(Bitmap.CompressFormat.JPEG, 100, thumbOut);
+            medium.compress(Bitmap.CompressFormat.JPEG, 100, mediumOut);
+            thumbOut.flush();
+            mediumOut.flush();
+            thumbOut.close();
+            mediumOut.close();
+            return PhotoUtils.base64Bitmap(PhotoUtils.toGrayScale(thumb));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return "";
+        }
     }
 
 

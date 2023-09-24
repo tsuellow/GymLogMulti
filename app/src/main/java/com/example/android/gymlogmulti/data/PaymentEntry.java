@@ -52,6 +52,8 @@ public class PaymentEntry {
         this.branch = branch;
     }
 
+    public PaymentEntry(){}
+
     @Ignore
     public PaymentEntry(String id, int clientId, String product, float amountUsd, Date paidFrom, Date paidUntil, Date timestamp, int isValid, int syncStatus, float exchangeRate, String currency, String comment, String extra, String dayOfWeek, String branch) {
         this.id = id;

@@ -27,6 +27,9 @@ public interface ClientDao {
     @Query("SELECT * FROM client WHERE id=:id")
     LiveData<ClientEntry> getClientById(int id);
 
+    @Query("SELECT * FROM client WHERE id=:id")
+    ClientEntry getClientByIdAsync(int id);
+
     @Query("SELECT * FROM client WHERE firstName||lastName LIKE :namePart " +
             "OR lastName LIKE :namePart OR CAST(id as TEXT) LIKE :namePart ORDER BY firstName ASC")
     LiveData<List<ClientEntry>> getClientByName(String namePart);
@@ -54,6 +57,16 @@ public interface ClientDao {
             "OR CAST(C.id as TEXT) LIKE :namePart " +
             "ORDER BY timestamp DESC")
     LiveData<List<ClientVisitJoin>> getCurrentClass(Date queryDate, String namePart, String branch);
+
+    @Query("select min(n) from (select 1+e+d*10+c*100+b*1000+a*10000 as n from\n" +
+            "(select 0 as a union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9)," +
+            "(select 0 as b union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9)," +
+            "(select 0 as c union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9)," +
+            "(select 0 as d union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9)," +
+            "(select 0 as e union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9))" +
+            "where n >5000 " +
+            "and n not in (select id from client);")
+    int autogenerateId();
 
     @Query("UPDATE client SET syncStatus=1 WHERE syncStatus!=1")
     void bulkUpdateClientSyncStatus();

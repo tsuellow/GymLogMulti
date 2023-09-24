@@ -12,12 +12,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.annotation.Nullable;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -31,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.example.android.gymlogmulti.data.ClientEntry;
 import com.example.android.gymlogmulti.data.GymDatabase;
@@ -40,6 +45,8 @@ import com.github.aakira.expandablelayout.ExpandableLinearLayout;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PayClientActivity extends AppCompatActivity {
 
@@ -136,27 +143,42 @@ public class PayClientActivity extends AppCompatActivity {
                 Calendar cal=Calendar.getInstance();
                 cal.setTime(dateFrom);
                 String selected=adapterView.getItemAtPosition(i).toString();
-                if (Constants.customProducts){
-                    cal.add(Calendar.MONTH, 1);
-                    cal.add(Calendar.DAY_OF_MONTH, -1);
-                    dateTo=cal.getTime();
-                    mTo.setText(getDateString(cal));
-                }else {
-                    if (selected.contentEquals(getString(R.string.week))) {
+
+                    if (Constants.USER_NAME=="muntogiFitness") {
+                        //Toast.makeText(getApplicationContext(),"you need to uncomment code for Muntogi",Toast.LENGTH_SHORT).show();
+                        if(selected.contains("Bloque")){
+                            Pattern p = Pattern.compile("\\d+(?=d.)");
+                            Matcher m = p.matcher(selected);
+                            while(m.find()) {
+                                int days=Integer.parseInt(m.group())-1;
+                                Log.d("seleccion",m.group());
+                                cal.add(Calendar.DAY_OF_MONTH, days);
+                                mTo.setText(getDateString(cal));
+                            }
+                        }else if (selected.contentEquals(getString(R.string.other))) {
+                            mTo.setText(getDateString(cal));
+                        }
+                        dateTo = cal.getTime();
+                    }else if (selected.contains(getString(R.string.week))) {
+                        Log.d("seleccion","semana");
                         cal.add(Calendar.DAY_OF_MONTH, 6);
                         mTo.setText(getDateString(cal));
-                    } else if (selected.contentEquals(getString(R.string.fortnight))) {
+                    } else if (selected.contains(getString(R.string.fortnight))) {
+                        Log.d("seleccion","quincena");
                         cal.add(Calendar.DAY_OF_MONTH, 14);
                         mTo.setText(getDateString(cal));
-                    } else if (selected.contentEquals(getString(R.string.month))) {
+                    } else {
+                        Log.d("seleccion","mes");
                         cal.add(Calendar.MONTH, 1);
                         cal.add(Calendar.DAY_OF_MONTH, -1);
                         mTo.setText(getDateString(cal));
-                    } else if (selected.contentEquals(getString(R.string.other))) {
-                        mTo.setText(getDateString(cal));
                     }
+//                    else if (selected.contentEquals(getString(R.string.other))) {
+//                        Log.d("seleccion","otro");
+//                        mTo.setText(getDateString(cal));
+//                    }
                     dateTo = cal.getTime();
-                }
+                //}
 
                 onSelectProductAnimator(mTo);
                 onSelectProductAnimator(mFrom);
@@ -477,6 +499,12 @@ public class PayClientActivity extends AppCompatActivity {
         daysOfWeek = mSat.isChecked() ? daysOfWeek+Calendar.SATURDAY+", " : daysOfWeek;
 
         final PaymentEntry paymentEntry=new PaymentEntry(clientId,product,amountUsd,dateFrom,dateTo,timestamp,exchangeRate,currency,comment,extra,daysOfWeek,MainActivity.GYM_BRANCH);
+        try {
+            Log.d("socketTest",new ObjectMapper().writeValueAsString(paymentEntry));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {

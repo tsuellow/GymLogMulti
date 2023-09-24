@@ -90,9 +90,23 @@
                 android:id="@+id/iv_flash_light"
                 android:layout_marginEnd="12dp"
                 android:layout_marginBottom="8dp"
-                android:src="@drawable/flash_light"
+                app:srcCompat="@drawable/flash_light"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="38dp"
+                android:id="@+id/iv_door"
+                android:alpha="0.4"
+                android:layout_marginStart="12dp"
+                android:layout_marginBottom="8dp"
+                android:src="@drawable/ic_open_exit_door"
+                android:tint="@color/colorWhite"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout

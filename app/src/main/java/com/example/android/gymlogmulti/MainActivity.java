@@ -12,6 +12,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,12 +29,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
+
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,9 +52,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.gymlogmulti.bluetooth.DoorController;
+import com.example.android.gymlogmulti.bluetooth.DoorSingleton;
 import com.example.android.gymlogmulti.data.ClientEntry;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.data.PaymentEntry;
+import com.example.android.gymlogmulti.data.Receptionist;
 import com.example.android.gymlogmulti.data.VisitEntry;
 import com.example.android.gymlogmulti.utils.DateMethods;
 import com.example.android.gymlogmulti.utils.PhotoUtils;
@@ -74,21 +82,20 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
-    public static final String GYM_ID=Constants.GYM_ID;
-    public static final String USER_NAME=Constants.USER_NAME;
-    public static final String GYM_BRANCH=Constants.GYM_BRANCH;
-    public static final String COMPANY_NAME=Constants.COMPANY_NAME;
-    public static final String COMPANY_OWNER=Constants.COMPANY_OWNER;
-    public static final boolean IS_MULTI=Constants.IS_MULTI;
-    public static final int RANGE_FROM=Constants.RANGE_FROM;
-    public static final int RANGE_TO=Constants.RANGE_TO;
+    public static final String GYM_ID = Constants.GYM_ID;
+    public static final String USER_NAME = Constants.USER_NAME;
+    public static final String GYM_BRANCH = Constants.GYM_BRANCH;
+    public static final String COMPANY_NAME = Constants.COMPANY_NAME;
+    public static final String COMPANY_OWNER = Constants.COMPANY_OWNER;
+    public static final boolean IS_MULTI = Constants.IS_MULTI;
+    public static final int RANGE_FROM = Constants.RANGE_FROM;
+    public static final int RANGE_TO = Constants.RANGE_TO;
 
 
-
-    public static final String CHANNEL_ID="111";
-    public static  final int MY_PERMISSIONS_REQUEST_READ_CONTACTS=555;
+    public static final String CHANNEL_ID = "111";
+    public static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 555;
     private Button mManualSearch;
     private Context mContext;
     private GymDatabase mDb;
@@ -108,6 +115,8 @@ public class MainActivity extends AppCompatActivity{
     SharedPreferences sharedPreferences;
 
     DoorController doorController;
+    DoorSingleton doorSingleton;
+    public static String openingMsg="O9T.";
     WebSocketConn webSocketConn;
 
     @Override
@@ -121,34 +130,34 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(mToolbar);
 
         //define which camera to use
-        sharedPreferences= PreferenceManager.getDefaultSharedPreferences(this);
-        boolean frontCamera=sharedPreferences.getBoolean("camera",true);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean frontCamera = sharedPreferences.getBoolean("camera", true);
 
         CameraSettings cameraSettings = new CameraSettings();
         if (frontCamera) {
             cameraSettings.setRequestedCameraId(1);
-        }else{
+        } else {
             cameraSettings.setRequestedCameraId(0);
         }
-        
+
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         //set multiple vars
-        mOrientation=(TextView) findViewById(R.id.tv_orientation);
-        mFlashLight=(ImageView) findViewById(R.id.iv_flash_light);
-        mDoor= findViewById((R.id.iv_door));
-        mTopBar=(ConstraintLayout) findViewById(R.id.cl_main_top);
-        mBottomBar=(LinearLayout) findViewById(R.id.ll_main_bottom);
-        mToolbarBackground=(ConstraintLayout) findViewById(R.id.tb_background);
-        mBarColor=mBottomBar.getSolidColor();
-        mTextColor=mOrientation.getCurrentTextColor();
-        mIsAnimated=false;
+        mOrientation = (TextView) findViewById(R.id.tv_orientation);
+        mFlashLight = (ImageView) findViewById(R.id.iv_flash_light);
+        mDoor = findViewById((R.id.iv_door));
+        mTopBar = (ConstraintLayout) findViewById(R.id.cl_main_top);
+        mBottomBar = (LinearLayout) findViewById(R.id.ll_main_bottom);
+        mToolbarBackground = (ConstraintLayout) findViewById(R.id.tb_background);
+        mBarColor = mBottomBar.getSolidColor();
+        mTextColor = mOrientation.getCurrentTextColor();
+        mIsAnimated = false;
         mFlashLight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!mIsAnimated) {
-                    mIsAnimated=true;
+                    mIsAnimated = true;
                     mOrientation.setTextColor(Color.parseColor("#757575"));
                     mTopBar.setBackgroundColor(getResources().getColor(R.color.colorWhite));
                     mBottomBar.setBackgroundColor(getResources().getColor(R.color.colorWhite));
@@ -159,7 +168,7 @@ public class MainActivity extends AppCompatActivity{
                         @Override
                         public void run() {
                             flashLightAnimation();
-                            mIsAnimated=false;
+                            mIsAnimated = false;
                         }
                     };
                     handler.postDelayed(runnable, 3000);
@@ -167,20 +176,30 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-        if (sharedPreferences.getBoolean("doorconnect",false)){
+        if (sharedPreferences.getBoolean("doorconnect", false)) {
             mDoor.setVisibility(View.VISIBLE);
-        }else{
+            mDoor.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext, "conectando...",Toast.LENGTH_SHORT).show();
+                    if (doorSingleton !=null){
+                        doorSingleton.initializeBluetooth();
+                    }
+                }
+            });
+            openingMsg="O"+sharedPreferences.getString("doorduration", "5")+(sharedPreferences.getBoolean("doorproximity", false)?"T":"F")+".";
+        } else {
             mDoor.setVisibility(View.GONE);
         }
 
-        mManualSearch =(Button) findViewById(R.id.bt_search);
+        mManualSearch = (Button) findViewById(R.id.bt_search);
 
-        mContext=getApplicationContext();
+        mContext = getApplicationContext();
 
-        mDb=GymDatabase.getInstance(mContext);
+        mDb = GymDatabase.getInstance(mContext);
 
         //define bar scanner settings
-        barcodeScannerView = (DecoratedBarcodeView)findViewById(R.id.zxing_barcode_scanner);
+        barcodeScannerView = (DecoratedBarcodeView) findViewById(R.id.zxing_barcode_scanner);
         Collection<BarcodeFormat> formats = Arrays.asList(BarcodeFormat.QR_CODE, BarcodeFormat.CODE_39);
         barcodeScannerView.getBarcodeView().setDecoderFactory(new DefaultDecoderFactory(formats));
         barcodeScannerView.initializeFromIntent(getIntent());
@@ -189,16 +208,16 @@ public class MainActivity extends AppCompatActivity{
         barcodeScannerView.decodeContinuous(callback);
 
         //manual search button
-        final boolean secureManualSearch=sharedPreferences.getBoolean("manualsearch",false);
+        final boolean secureManualSearch = sharedPreferences.getBoolean("manualsearch", false);
         mManualSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!secureManualSearch) {
                     Intent i = new Intent(getApplicationContext(), ClientsSearchActivity.class);
                     startActivity(i);
-                }else{
+                } else {
                     Intent i = new Intent(getApplicationContext(), LoginScreen.class);
-                    i.putExtra("goal","manual_search");
+                    i.putExtra("goal", "manual_search");
                     startActivity(i);
                 }
             }
@@ -207,14 +226,28 @@ public class MainActivity extends AppCompatActivity{
         createNotificationChannel();
         resetAlarm();
         //websocket test
-        webSocketConn=new WebSocketConn("http://192.168.1.104:81",Constants.GYM_BRANCH,this);
-        webSocketConn.openSocket();
+        String socketIp = sharedPreferences.getString("socketip", "https://gymlog-socket.webdvlopmnt.com");
+        String receptionists = Receptionist.blobToReceptionistArray(sharedPreferences.getString("receptionists", ""));
+        //assert socketIp != null;
+        try {
+            webSocketConn = new WebSocketConn(socketIp, receptionists, this);
+            webSocketConn.openSocket();
+        } catch (Exception e) {
+            Toast.makeText(this, R.string.wrong_websocket, Toast.LENGTH_LONG).show();
+        }
         //bluetooth test
-        doorController=new DoorController(this);
-        doorController.initializeBluetooth();
-
-
-
+        if (sharedPreferences.getBoolean("doorconnect", false)) {
+//            doorController=new DoorController(this);
+//            doorController.initializeBluetooth();
+            if (checkBtPermissions()) {
+                setUpBt();
+                Log.d("kherson","correct path");
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN},
+                        doorSingleton.REQUEST_ENABLE_BT);
+            }
+        }
 
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.READ_CONTACTS)
@@ -232,6 +265,54 @@ public class MainActivity extends AppCompatActivity{
 
             }
         }
+    }
+
+    private void setUpBt() {
+        if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            startActivityForResult(enableBtIntent, doorSingleton.REQUEST_ENABLE_BT);
+        }
+        Log.d("kherson","correct path2");
+        doorSingleton = DoorSingleton.getInstance();
+        processBtMsgs();
+    }
+
+    private void processBtMsgs(){
+        doorSingleton.setBtInterface(new DoorSingleton.BlueToothConnInterface() {
+            @Override
+            public void postMsg(String msg) {
+                showToast(msg);
+            }
+
+            @Override
+            public void setConnected(Boolean conn) {
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    public void run() {
+                        setDoorConnected(conn);
+                    }
+                });
+
+
+            }
+        });
+    }
+
+    private void showToast(String msg) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            public void run() {
+                Toast.makeText(getApplicationContext(), msg,Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    public Boolean checkBtPermissions(){
+        return ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED;
     }
 
     //flashlight method
@@ -258,8 +339,13 @@ public class MainActivity extends AppCompatActivity{
         colorAnimText.start();
     }
 
-    public void setDoorConnected(int color){
-        mDoor.setColorFilter(ContextCompat.getColor(mContext,color));
+    public void setDoorConnected(Boolean conn){
+        if(conn){
+            mDoor.setColorFilter(ContextCompat.getColor(mContext,R.color.colorAccent));
+        }else{
+            mDoor.setColorFilter(ContextCompat.getColor(mContext,R.color.colorWhite));
+        }
+
     }
 
 
@@ -293,15 +379,16 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
-
+        if(checkBtPermissions() && sharedPreferences.getBoolean("doorconnect", false) && doorSingleton!=null){
+            processBtMsgs();
+            setDoorConnected(doorSingleton.isConnected);
+        }
         barcodeScannerView.resume();
-
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
         barcodeScannerView.pause();
     }
 
@@ -421,7 +508,7 @@ public class MainActivity extends AppCompatActivity{
                             float singlePayment1 = Float.valueOf(singlePaymentStr1);
                             float exchangeRate = Float.valueOf(exchangeRateStr);
                             final PaymentEntry singlePassPay = new PaymentEntry(singleVisitId, getString(R.string.single_day_pass), singlePayment1/exchangeRate,
-                                    new Date(), new Date(), new Date(),exchangeRate,"C$",null,null,null,MainActivity.GYM_BRANCH);
+                                    new Date(), new Date(), new Date(),exchangeRate,"C$","","","",MainActivity.GYM_BRANCH);
                             AppExecutors.getInstance().diskIO().execute(new Runnable() {
                                 @Override
                                 public void run() {
@@ -437,7 +524,7 @@ public class MainActivity extends AppCompatActivity{
                             float singlePayment2=Float.valueOf(singlePaymentStr2);
                             float exchangeRate = Float.valueOf(exchangeRateStr);
                             final PaymentEntry singlePassPay=new PaymentEntry(singleVisitId,getString(R.string.single_day_pass),singlePayment2/exchangeRate,
-                                    new Date(),new Date(),new Date(),exchangeRate,"C$",null,null,null,MainActivity.GYM_BRANCH);
+                                    new Date(),new Date(),new Date(),exchangeRate,"C$","","","",MainActivity.GYM_BRANCH);
                             AppExecutors.getInstance().diskIO().execute(new Runnable() {
                                 @Override
                                 public void run() {
@@ -489,7 +576,7 @@ public class MainActivity extends AppCompatActivity{
             mTopStrip.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             mBottomStrip.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             mFirstLineTop.setText(R.string.welcome);
-            mSecondLineTop.setText(mClientData.getFirstName()+",");
+            mSecondLineTop.setText(mClientData.getFirstName()+" ID:"+mClientData.getId()+",");
             mFirstLineBottom.setText(""+daysLeft);
             mSecondLineBottom.setText(R.string.days_access_remaining);
             if (daysLeft<4){
@@ -497,11 +584,19 @@ public class MainActivity extends AppCompatActivity{
             }else{
                 mFirstLineBottom.setTextColor(getResources().getColor(android.R.color.secondary_text_dark));
             }
-            doorController.sendOpenDoorMsg();
+            if (sharedPreferences.getBoolean("doorconnect",false)){
+                //doorController.sendOpenDoorMsg();
+                try {
+                    doorSingleton.sendOpenDoorMsg(openingMsg);
+                }catch (Exception e){
+                    Toast.makeText(mContext,"no door found",Toast.LENGTH_SHORT).show();
+                }
+
+            }
         }else{
             mTopStrip.setBackgroundColor(getResources().getColor(R.color.colorRed));
             mBottomStrip.setBackgroundColor(getResources().getColor(R.color.colorRed));
-            mFirstLineTop.setText(getString(R.string.sorry)+" "+mClientData.getFirstName()+",");
+            mFirstLineTop.setText(getString(R.string.sorry)+" "+mClientData.getFirstName()+" ID:"+mClientData.getId()+",");
             mSecondLineTop.setText(R.string.your_access_has_expired);
             mFirstLineBottom.setText(R.string.please_pay_access);
             mSecondLineBottom.setText(R.string.thanks_for_staying);
@@ -641,8 +736,13 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-
-
-
-
+    @Override
+    protected void onDestroy() {
+        try{
+            webSocketConn.closeSocket();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        super.onDestroy();
+    }
 }

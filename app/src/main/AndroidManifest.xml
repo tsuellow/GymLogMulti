@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.android.gymlogmulti">
 
     <uses-feature android:name="android.hardware.camera.any" />
 
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
@@ -33,7 +38,8 @@
             android:name="com.example.android.gymlogmulti.MainActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:theme="@style/AppTheme.NoActionBar"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,7 +50,7 @@
             android:name="com.example.android.gymlogmulti.SendReminderActivity"
             android:label="@string/send_reminder"
             android:parentActivityName="com.example.android.gymlogmulti.SearchActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.example.android.gymlogmulti.CurrentClassActivity"
             android:label="@string/current_class"
@@ -100,7 +106,7 @@
         <receiver
             android:name="com.example.android.gymlogmulti.BackupBroadcastReceiver"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false" />
     </application>
 
 </manifest>

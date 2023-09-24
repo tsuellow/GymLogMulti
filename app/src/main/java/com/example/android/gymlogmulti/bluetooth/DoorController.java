@@ -1,10 +1,13 @@
 package com.example.android.gymlogmulti.bluetooth;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,45 +24,69 @@ import java.util.logging.LogRecord;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.core.app.ActivityCompat;
+
 public class DoorController {
 
-    public final int  REQUEST_ENABLE_BT=63;
+    //TODO make singleton
+
+    public final int REQUEST_ENABLE_BT = 63;
     Context mContext;
     BluetoothAdapter bluetoothAdapter;
-    UUID uuid=UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     //ConnectThread connectThread;
     ConnectedThread mgmtThread;
-    boolean isConnected=false;
+    boolean isConnected = false;
 
-    public DoorController(Context context){
-        mContext=context;
+    public DoorController(Context context) {
+        mContext = context;
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
-    public void  initializeBluetooth(){
+    public void initializeBluetooth() {
         if (bluetoothAdapter == null) {
-            Toast.makeText(mContext,"this device does not support bluetooth",Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, "this device does not support bluetooth", Toast.LENGTH_LONG).show();
             return;
         }
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            ((MainActivity)mContext).startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            ((MainActivity) mContext).startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
-        if (getDoorFromPaired()==null){
-            Toast.makeText(mContext,"door not found",Toast.LENGTH_LONG).show();
+        if (getDoorFromPaired() == null) {
+            Toast.makeText(mContext, "door not found", Toast.LENGTH_LONG).show();
             return;
         }
-        ConnectThread connection=new ConnectThread(getDoorFromPaired());
+        ConnectThread connection = new ConnectThread(getDoorFromPaired());
         connection.start();
     }
 
 
-    public BluetoothDevice getDoorFromPaired(){
+    public BluetoothDevice getDoorFromPaired() {
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return null;
+        }
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             // There are paired devices. Get the name and address of each paired device.
             for (BluetoothDevice device : pairedDevices) {
-                if (device.getName().contentEquals("PuertaTest")){
+                if (device.getName().contentEquals("PuertaGym")) {
                     return device;
                 }
             }
@@ -68,13 +95,13 @@ public class DoorController {
         return null;
     }
 
-    public void sendOpenDoorMsg(){
+    public void sendOpenDoorMsg() {
         if (isConnected)
             mgmtThread.openDoor();
     }
 
     private class ConnectThread extends Thread {
-        private final BluetoothSocket mmSocket;
+        private BluetoothSocket mmSocket;
 
         public ConnectThread(BluetoothDevice device) {
             // Use a temporary object that is later assigned to mmSocket
@@ -84,6 +111,16 @@ public class DoorController {
             try {
                 // Get a BluetoothSocket to connect with the given BluetoothDevice.
                 // MY_UUID is the app's UUID string, also used in the server code.
+                if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
                 tmp = device.createRfcommSocketToServiceRecord(uuid);
             } catch (IOException e) {
                 Log.e(TAG, "Socket's create() method failed", e);
@@ -93,6 +130,16 @@ public class DoorController {
 
         public void run() {
             // Cancel discovery because it otherwise slows down the connection.
+            if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             bluetoothAdapter.cancelDiscovery();
 
             try {
@@ -117,7 +164,7 @@ public class DoorController {
                 @Override
                 public void run() {
                     Toast.makeText(mContext,"successfully connected to door",Toast.LENGTH_LONG).show();
-                    ((MainActivity)mContext).setDoorConnected(R.color.colorAccent);
+                    //((MainActivity)mContext).setDoorConnected(R.color.colorAccent);
                 }
             });
 
@@ -197,7 +244,7 @@ public class DoorController {
                         @Override
                         public void run() {
                             Toast.makeText(mContext,"connection lost",Toast.LENGTH_LONG).show();
-                            ((MainActivity)mContext).setDoorConnected(R.color.colorWhite);
+                            //((MainActivity)mContext).setDoorConnected(R.color.colorWhite);
                         }
                     });
 
@@ -207,7 +254,7 @@ public class DoorController {
                     @Override
                     public void run() {
                         Toast.makeText(mContext,"connection lost",Toast.LENGTH_LONG).show();
-                        ((MainActivity)mContext).setDoorConnected(R.color.colorWhite);
+                        //((MainActivity)mContext).setDoorConnected(R.color.colorWhite);
                     }
                 });
             }

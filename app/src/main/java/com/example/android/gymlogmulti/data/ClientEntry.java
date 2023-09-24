@@ -4,8 +4,10 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Date;
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity(tableName = "client")
 public class ClientEntry {
 
@@ -35,6 +37,8 @@ public class ClientEntry {
         this.qrCode = qrCode;
         this.lastUpdated = lastUpdated;
     }
+
+    public ClientEntry(){};
 
     @Ignore
     public ClientEntry(int id, String firstName, String lastName, Date dob, String gender, String occupation, String phone, String photo, String qrCode, Date lastUpdated, int syncStatus) {

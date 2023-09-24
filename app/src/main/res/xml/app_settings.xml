@@ -41,6 +41,17 @@
             android:key="gymdata"
             android:title="@string/gym_data"/>
 
+        <Preference
+            android:key="receptionists"
+            android:title="@string/receptionist_setting"
+            android:summary="@string/receptionist_summary"/>
+
+        <EditTextPreference
+            android:title="Websocket IP"
+            android:defaultValue="https://gymlog-socket.webdvlopmnt.com"
+            android:key="socketip"
+            app:useSimpleSummaryProvider="true"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory

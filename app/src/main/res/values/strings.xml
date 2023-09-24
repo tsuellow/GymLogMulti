@@ -279,6 +279,20 @@
     <string name="door_duration_summary">Closes door when proximity sensor is not used</string>
     <string name="send_receipt">send receipt</string>
     <string name="client">Client:</string>
+    <string name="please_restart_the_app_for_changes_to_take_effect">Please restart the app for changes to take effect</string>
+    <string name="add">Add</string>
+    <string name="username">Username</string>
+    <string name="receptionist_setting">Reception Logins</string>
+    <string name="receptionist_summary">Add receptionist logins</string>
+    <string name="send">Send</string>
+    <string name="recep_title">Add Receptionists</string>
+    <string name="empty_phone">phone cannot be empty</string>
+    <string name="wrong_user">username can only contain letters</string>
+    <string name="wrong_websocket">websocket ip is incorrect</string>
+    <string name="generate">Generate</string>
+    <string name="sendqr">Do you want to sent the QR key to </string>
+    <string name="sendqrtitle">Send QR code</string>
+    <string name="sendtitle">PAYMENT CONFIRMATION</string>
 
 
 </resources>

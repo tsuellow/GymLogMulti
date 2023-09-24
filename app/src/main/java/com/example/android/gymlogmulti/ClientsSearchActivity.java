@@ -1,10 +1,15 @@
 package com.example.android.gymlogmulti;
 
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -17,6 +22,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.gymlogmulti.bluetooth.DoorSingleton;
 import com.example.android.gymlogmulti.data.ClientEntry;
 import com.example.android.gymlogmulti.data.GymDatabase;
 import com.example.android.gymlogmulti.data.PaymentEntry;
@@ -50,12 +59,17 @@ public class ClientsSearchActivity extends AppCompatActivity implements ClientsS
     private ClientEntry mClientData;
     private PaymentEntry mPaymentData;
 
+    SharedPreferences sharedPreferences;
+    DoorSingleton doorSingleton;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         //normal variable instantiation
         setContentView(R.layout.activity_clients_search);
@@ -79,6 +93,51 @@ public class ClientsSearchActivity extends AppCompatActivity implements ClientsS
         }
 
         populateDataSource(searchString);
+        if (sharedPreferences.getBoolean("doorconnect", false) && checkBtPermissions()){
+            doorSingleton=DoorSingleton.getInstance();
+        }
+    }
+
+    public Boolean checkBtPermissions(){
+        return ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        processBtMsgs();
+    }
+
+    private void processBtMsgs(){
+        if (doorSingleton!=null){
+            doorSingleton.setBtInterface(new DoorSingleton.BlueToothConnInterface() {
+                @Override
+                public void postMsg(String msg) {
+                    showToast(msg);
+
+                }
+
+                @Override
+                public void setConnected(Boolean conn) {
+                    if(conn){
+                        showToast("Bluetooth connected");
+                    }else{
+                        showToast("Bluetooth disconnected");
+                    }
+
+                }
+            });
+        }
+    }
+
+    private void showToast(String msg) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            public void run() {
+                Toast.makeText(getApplicationContext(), msg,Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void populateDataSource(String s) {
@@ -232,7 +291,7 @@ public class ClientsSearchActivity extends AppCompatActivity implements ClientsS
             mTopStrip.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             mBottomStrip.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             mFirstLineTop.setText(R.string.welcome);
-            mSecondLineTop.setText(mClientData.getFirstName()+",");
+            mSecondLineTop.setText(mClientData.getFirstName()+" ID:"+mClientData.getId()+",");
             mFirstLineBottom.setText(""+daysLeft);
             mSecondLineBottom.setText(R.string.days_access_remaining);
             if (daysLeft<4){
@@ -240,10 +299,20 @@ public class ClientsSearchActivity extends AppCompatActivity implements ClientsS
             }else{
                 mFirstLineBottom.setTextColor(getResources().getColor(android.R.color.secondary_text_dark));
             }
+
+            if (sharedPreferences.getBoolean("doorconnect",false) && checkBtPermissions()){
+                //doorController.sendOpenDoorMsg();
+                try {
+                    doorSingleton.sendOpenDoorMsg(MainActivity.openingMsg);
+                }catch (Exception e){
+                    Toast.makeText(mContext,"no door found",Toast.LENGTH_SHORT).show();
+                }
+            }
+
         }else{
             mTopStrip.setBackgroundColor(getResources().getColor(R.color.colorRed));
             mBottomStrip.setBackgroundColor(getResources().getColor(R.color.colorRed));
-            mFirstLineTop.setText(getString(R.string.sorry)+" "+mClientData.getFirstName()+",");
+            mFirstLineTop.setText(getString(R.string.sorry)+" "+mClientData.getFirstName()+" ID:"+mClientData.getId()+",");
             mSecondLineTop.setText(R.string.your_access_has_expired);
             mFirstLineBottom.setText(R.string.please_pay_access);
             mSecondLineBottom.setText(R.string.thanks_for_staying);

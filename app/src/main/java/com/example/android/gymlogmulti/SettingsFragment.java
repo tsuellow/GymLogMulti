@@ -4,6 +4,8 @@ import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+
+import com.example.android.gymlogmulti.data.Receptionist;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.EditTextPreference;
@@ -12,6 +14,8 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.preference.PreferenceFragment;
 import android.view.View;
@@ -32,7 +36,7 @@ import static java.security.AccessController.getContext;
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     EditTextPreference gymName, doorDuration;
-    Preference changePin, changeOwnerPin, backupAll, restoreAll, backupTime, exchangeRate, singlePassMinus1, singlePassMinus2, gymData, serverAddress;
+    Preference changePin, changeOwnerPin, backupAll, restoreAll, backupTime, exchangeRate, singlePassMinus1, receptionists, singlePassMinus2, gymData, serverAddress;
     ListPreference preferredCurrency;
     SwitchPreference connectDoor, useProximitySensor;
     TimePickerDialog.OnTimeSetListener onTimeSetListenerBackup;
@@ -119,6 +123,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 displayPinDialog("changeownerpin",changeOwnerPin.getTitle().toString());
+                return false;
+            }
+        });
+
+        receptionists=(Preference) findPreference("receptionists");
+        receptionists.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                displayReceptionistValidationDialog();
                 return false;
             }
         });
@@ -302,6 +315,93 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 }else{
                     Toast.makeText(getContext(), R.string.wrong_owner_pin,Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        mCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    private void displayReceptionistValidationDialog(){
+        AlertDialog.Builder mBuilder=new AlertDialog.Builder(getContext());
+        View mView=getLayoutInflater().inflate(R.layout.dialog_validation,null);
+        final EditText mOwnerPin=(EditText) mView.findViewById(R.id.admin_pin);
+        String currPin=sharedPreferences.getString("changeownerpin","1234");
+        Button mOk=(Button) mView.findViewById(R.id.btn_ok_pin);
+        Button mCancel=(Button) mView.findViewById(R.id.btn_cancel_pin);
+        mBuilder.setTitle(R.string.recep_title);
+        mBuilder.setView(mView);
+
+        final AlertDialog dialog=mBuilder.create();
+
+        //button to dismiss dialog
+        mOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mOwnerPin.getText().toString().contentEquals(currPin)){
+                    displayReceptionistDialog();
+                    dialog.dismiss();
+                }else{
+                    Toast.makeText(getContext(), R.string.wrong_owner_pin,Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+        mCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void displayReceptionistDialog(){
+        AlertDialog.Builder mBuilder=new AlertDialog.Builder(getContext());
+        View mView=getLayoutInflater().inflate(R.layout.dialog_add_receptionist,null);
+
+        RecyclerView rvReceptionists=(RecyclerView) mView.findViewById(R.id.rv_receptionists);
+        ReceptionistAdapter adapter=new ReceptionistAdapter(getContext());
+        rvReceptionists.setAdapter(adapter);
+        rvReceptionists.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        EditText username=(EditText) mView.findViewById(R.id.username);
+        EditText phone=(EditText) mView.findViewById(R.id.phone);
+
+        Button mOk=(Button) mView.findViewById(R.id.btn_ok_pin);
+        Button mCancel=(Button) mView.findViewById(R.id.btn_cancel_pin);
+        mBuilder.setTitle(R.string.recep_title);
+        mBuilder.setView(mView);
+
+        final AlertDialog dialog=mBuilder.create();
+
+        //button to dismiss dialog
+        mOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String name=username.getText().toString();
+                String tele=phone.getText().toString();
+                    if (name.matches("[a-zA-Z]+")){
+                        if(!tele.isEmpty()){
+                            adapter.addRecep(new Receptionist(name, tele));
+                            username.setText("");
+                            phone.setText("");
+                        }else{
+                            Toast.makeText(getContext(), R.string.empty_phone,Toast.LENGTH_SHORT).show();
+                        }
+                    }else{
+                        Toast.makeText(getContext(), R.string.wrong_user,Toast.LENGTH_SHORT).show();
+                    }
+
             }
         });
 

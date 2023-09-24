@@ -230,9 +230,23 @@
     <string name="door_proximity_summary">Cierra la puerta automaticamente después del acceso</string>
     <string name="door_duration">Tiempo de apertura en segundos</string>
     <string name="door_duration_summary">define el tiempo de apertura cuando </string>
-    <string name="send_receipt">send receipt</string>
+    <string name="send_receipt">enviar recibo</string>
     <string name="client">Cliente:</string>
 
     <string name="external">externo</string>
+    <string name="please_restart_the_app_for_changes_to_take_effect">Reiniciá la app para que los cambios surtan efecto</string>
+    <string name="add">Agregar</string>
+    <string name="username">usuario</string>
+    <string name="receptionist_setting">Logins de recepcionista</string>
+    <string name="receptionist_summary">Agregar login de recepcionista</string>
+    <string name="send">Enviar</string>
+    <string name="recep_title">Agregar recepcionistas</string>
+    <string name="empty_phone">el número de celular no debe estar vacío</string>
+    <string name="wrong_user">el usuario solo debe contener letras</string>
+    <string name="wrong_websocket">IP de Websocket incorrecto</string>
+    <string name="generate">Generar</string>
+    <string name="sendqr">Enviar el código por Whatsapp a </string>
+    <string name="sendqrtitle">Enviar Código QR</string>
+    <string name="sendtitle">CONFIRMACION DE PAGO</string>
 
 </resources>
